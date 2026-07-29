@@ -1,0 +1,153 @@
+<script setup lang="ts">
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
+import SiteLogo from '@/components/SiteLogo.vue';
+import UserMenuContent from '@/components/UserMenuContent.vue';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { getInitials } from '@/composables/useInitials';
+import type { SharedData } from '@/types';
+import { Link, router, usePage } from '@inertiajs/vue3';
+import { Menu, Plus, Search, Shield, User as UserIcon } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+const page = usePage<SharedData>();
+const user = computed(() => page.props.auth.user);
+const searchQuery = ref('');
+
+function submitSearch() {
+    const q = searchQuery.value.trim();
+    if (!q) return;
+    router.get(route('search'), { q });
+}
+
+const navItems = computed(() => {
+    const items = [{ title: t('nav.lists'), href: route('lists.index') }];
+
+    if (user.value) {
+        items.push({ title: t('nav.diary'), href: route('diary.index') }, { title: t('nav.watchlist'), href: route('watchlist.index') });
+    }
+
+    return items;
+});
+</script>
+
+<template>
+    <header class="border-b border-lb-line/30 bg-lb-bg">
+        <div class="mx-auto flex h-[72px] max-w-[1120px] items-center gap-4 px-4">
+            <!-- Menú mobile -->
+            <div class="lg:hidden">
+                <Sheet>
+                    <SheetTrigger :as-child="true">
+                        <Button variant="ghost" size="icon" class="h-9 w-9 text-lb-text">
+                            <Menu class="h-5 w-5" />
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent side="left" class="w-[280px] bg-lb-bg p-6">
+                        <SheetTitle class="sr-only">Menu</SheetTitle>
+                        <SheetHeader class="flex justify-start text-left">
+                            <Link :href="route('home')"><SiteLogo /></Link>
+                        </SheetHeader>
+                        <nav class="mt-6 flex flex-col space-y-1">
+                            <Link
+                                v-for="item in navItems"
+                                :key="item.title"
+                                :href="item.href"
+                                class="rounded px-3 py-2 text-sm font-semibold uppercase tracking-[0.075em] text-lb-text hover:bg-accent hover:text-white"
+                            >
+                                {{ item.title }}
+                            </Link>
+                        </nav>
+                    </SheetContent>
+                </Sheet>
+            </div>
+
+            <Link :href="route('home')" class="shrink-0">
+                <SiteLogo />
+            </Link>
+
+            <!-- Nav desktop -->
+            <nav class="hidden flex-1 items-center gap-1 lg:flex">
+                <Link
+                    v-for="item in navItems"
+                    :key="item.title"
+                    :href="item.href"
+                    class="rounded px-3 py-2 text-[0.8125rem] font-bold uppercase tracking-[0.075em] text-lb-text transition-colors hover:text-white"
+                >
+                    {{ item.title }}
+                </Link>
+            </nav>
+
+            <div class="ml-auto flex items-center gap-2">
+                <form @submit.prevent="submitSearch" class="relative hidden sm:block">
+                    <Search class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-lb-muted" />
+                    <input
+                        v-model="searchQuery"
+                        type="search"
+                        :placeholder="t('nav.search')"
+                        class="h-9 w-40 rounded-full border-0 bg-lb-surface pl-9 pr-3 text-sm text-white transition-all placeholder:text-lb-muted focus:w-56 focus:outline-none focus:ring-2 focus:ring-lb-blue/70"
+                    />
+                </form>
+
+                <!-- + LOG: lleva a la búsqueda para encontrar qué registrar -->
+                <Button v-if="user" as-child class="hidden h-9 gap-1 px-4 text-[0.8125rem] font-bold uppercase tracking-[0.075em] sm:inline-flex">
+                    <Link :href="route('search')">
+                        <Plus class="size-4" />
+                        {{ t('nav.log') }}
+                    </Link>
+                </Button>
+
+                <LanguageSwitcher />
+
+                <!-- Usuario -->
+                <template v-if="user">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger :as-child="true">
+                            <Button variant="ghost" size="icon" class="relative size-10 w-auto rounded-full p-1">
+                                <Avatar class="size-8 overflow-hidden rounded-full ring-1 ring-white/25">
+                                    <AvatarImage v-if="user.avatar_path" :src="user.avatar_path" :alt="user.name" />
+                                    <AvatarFallback class="rounded-full bg-lb-surface text-sm font-semibold text-white">
+                                        {{ getInitials(user.name) }}
+                                    </AvatarFallback>
+                                </Avatar>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" class="w-56">
+                            <DropdownMenuItem :as-child="true">
+                                <Link class="block w-full cursor-pointer" :href="route('profiles.show', user.username)">
+                                    <UserIcon class="mr-2 inline size-4" />
+                                    {{ t('nav.profile') }}
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <template v-if="user.role === 'admin'">
+                                <DropdownMenuItem :as-child="true">
+                                    <Link class="block w-full cursor-pointer" :href="route('admin.dashboard')">
+                                        <Shield class="mr-2 inline size-4" />
+                                        {{ t('nav.admin') }}
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                            </template>
+                            <UserMenuContent :user="user" />
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </template>
+                <template v-else>
+                    <Link :href="route('login')" class="px-2 text-[0.8125rem] font-bold uppercase tracking-[0.075em] text-lb-text hover:text-white">
+                        {{ t('nav.login') }}
+                    </Link>
+                    <Link
+                        :href="route('register')"
+                        class="rounded bg-lb-green-dark px-3 py-2 text-[0.8125rem] font-bold uppercase tracking-[0.075em] text-white hover:bg-lb-green"
+                    >
+                        {{ t('nav.register') }}
+                    </Link>
+                </template>
+            </div>
+        </div>
+    </header>
+</template>

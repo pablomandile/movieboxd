@@ -1,0 +1,230 @@
+<?php
+
+namespace App\Services\Tmdb;
+
+use App\Enums\TitleType;
+use App\Models\Season;
+use App\Models\Title;
+use Illuminate\Support\Str;
+
+/**
+ * Convierte payloads de TMDB en snapshots locales (upsert de Eloquent).
+ *
+ * Import on demand: los títulos se importan la primera vez que alguien
+ * los visita; los episodios de una temporada, al visitar la temporada.
+ */
+class TmdbImportService
+{
+    public function __construct(protected TmdbClient $client) {}
+
+    public function importTitle(TitleType $type, int $tmdbId): Title
+    {
+        return $type === TitleType::Movie
+            ? $this->importMovie($tmdbId)
+            : $this->importTv($tmdbId);
+    }
+
+    public function importMovie(int $tmdbId): Title
+    {
+        $data = $this->client->movie($tmdbId);
+
+        return $this->upsertTitle(TitleType::Movie, $tmdbId, $data['title'] ?? (string) $tmdbId, [
+            'title' => $data['title'],
+            'original_title' => $data['original_title'] ?? null,
+            'translations' => $this->extractTranslations($data),
+            'overview' => $data['overview'] ?: null,
+            'tagline' => $data['tagline'] ?: null,
+            'poster_path' => $data['poster_path'] ?? null,
+            'backdrop_path' => $data['backdrop_path'] ?? null,
+            'release_date' => $data['release_date'] ?: null,
+            'runtime' => $data['runtime'] ?? null,
+            'genres' => $data['genres'] ?? [],
+            'credits' => $this->extractMovieCredits($data['credits'] ?? []),
+            'original_language' => $data['original_language'] ?? null,
+            'popularity' => $data['popularity'] ?? 0,
+            'synced_at' => now(),
+        ]);
+    }
+
+    public function importTv(int $tmdbId): Title
+    {
+        $data = $this->client->tv($tmdbId);
+
+        $title = $this->upsertTitle(TitleType::Tv, $tmdbId, $data['name'] ?? (string) $tmdbId, [
+            'title' => $data['name'],
+            'original_title' => $data['original_name'] ?? null,
+            'translations' => $this->extractTranslations($data),
+            'overview' => $data['overview'] ?: null,
+            'tagline' => $data['tagline'] ?: null,
+            'poster_path' => $data['poster_path'] ?? null,
+            'backdrop_path' => $data['backdrop_path'] ?? null,
+            'release_date' => $data['first_air_date'] ?: null,
+            'genres' => $data['genres'] ?? [],
+            'credits' => $this->extractTvCredits($data),
+            'original_language' => $data['original_language'] ?? null,
+            'popularity' => $data['popularity'] ?? 0,
+            'tv_status' => $data['status'] ?? null,
+            'last_air_date' => $data['last_air_date'] ?: null,
+            'seasons_count' => $data['number_of_seasons'] ?? null,
+            'episodes_count' => $data['number_of_episodes'] ?? null,
+            'synced_at' => now(),
+        ]);
+
+        // Stubs de temporadas: los episodios llegan lazy vía importSeason()
+        foreach ($data['seasons'] ?? [] as $seasonData) {
+            $title->seasons()->updateOrCreate(
+                ['season_number' => $seasonData['season_number']],
+                [
+                    'tmdb_id' => $seasonData['id'],
+                    'name' => $seasonData['name'] ?? "Season {$seasonData['season_number']}",
+                    'overview' => $seasonData['overview'] ?: null,
+                    'poster_path' => $seasonData['poster_path'] ?? null,
+                    'air_date' => $seasonData['air_date'] ?: null,
+                    'episodes_count' => $seasonData['episode_count'] ?? 0,
+                ]
+            );
+        }
+
+        return $title;
+    }
+
+    public function importSeason(Title $title, int $seasonNumber): Season
+    {
+        $data = $this->client->tvSeason($title->tmdb_id, $seasonNumber);
+
+        $season = $title->seasons()->updateOrCreate(
+            ['season_number' => $seasonNumber],
+            [
+                'tmdb_id' => $data['id'],
+                'name' => $data['name'] ?? "Season {$seasonNumber}",
+                'overview' => $data['overview'] ?: null,
+                'translations' => $this->extractTranslations($data, 'name'),
+                'poster_path' => $data['poster_path'] ?? null,
+                'air_date' => $data['air_date'] ?: null,
+                'episodes_count' => count($data['episodes'] ?? []),
+                'synced_at' => now(),
+            ]
+        );
+
+        foreach ($data['episodes'] ?? [] as $episodeData) {
+            $season->episodes()->updateOrCreate(
+                ['episode_number' => $episodeData['episode_number']],
+                [
+                    'title_id' => $title->id,
+                    'tmdb_id' => $episodeData['id'],
+                    'season_number' => $seasonNumber,
+                    'name' => $episodeData['name'] ?? "Episode {$episodeData['episode_number']}",
+                    'overview' => $episodeData['overview'] ?: null,
+                    'still_path' => $episodeData['still_path'] ?? null,
+                    'air_date' => $episodeData['air_date'] ?: null,
+                    'runtime' => $episodeData['runtime'] ?? null,
+                ]
+            );
+        }
+
+        return $season->fresh(['episodes']);
+    }
+
+    /**
+     * Re-importa un título existente (refresco de snapshot viejo).
+     */
+    public function refresh(Title $title): Title
+    {
+        return $this->importTitle($title->type, $title->tmdb_id);
+    }
+
+    protected function upsertTitle(TitleType $type, int $tmdbId, string $displayTitle, array $attributes): Title
+    {
+        $existing = Title::where('type', $type)->where('tmdb_id', $tmdbId)->first();
+
+        if ($existing) {
+            $existing->update($attributes);
+
+            return $existing;
+        }
+
+        // El slug se genera una sola vez: las URLs son estables
+        return Title::create($attributes + [
+            'type' => $type,
+            'tmdb_id' => $tmdbId,
+            'slug' => $this->makeSlug($displayTitle, $tmdbId),
+        ]);
+    }
+
+    protected function makeSlug(string $name, int $tmdbId): string
+    {
+        $slug = Str::slug($name) ?: (string) $tmdbId;
+
+        return Title::where('slug', $slug)->exists() ? "{$slug}-{$tmdbId}" : $slug;
+    }
+
+    /**
+     * Extrae es/en del append translations (una sola llamada trae todo).
+     * Movies usan data.title, series y temporadas usan data.name.
+     */
+    protected function extractTranslations(array $data, string $nameKey = 'title'): array
+    {
+        $out = [];
+
+        foreach ($data['translations']['translations'] ?? [] as $translation) {
+            $lang = $translation['iso_639_1'] ?? null;
+
+            if (! in_array($lang, ['es', 'en'], true)) {
+                continue;
+            }
+
+            $entry = array_filter([
+                'title' => $translation['data'][$nameKey] ?? $translation['data']['name'] ?? null,
+                'overview' => $translation['data']['overview'] ?? null,
+                'tagline' => $translation['data']['tagline'] ?? null,
+            ]);
+
+            if ($entry === []) {
+                continue;
+            }
+
+            // Ante varias variantes del mismo idioma (es-ES/es-MX), gana la más completa
+            if (! isset($out[$lang]) || count($entry) > count($out[$lang])) {
+                $out[$lang] = $entry;
+            }
+        }
+
+        return $out;
+    }
+
+    protected function extractMovieCredits(array $credits): array
+    {
+        return [
+            'cast' => collect($credits['cast'] ?? [])->take(20)->map(fn (array $person) => [
+                'tmdb_id' => $person['id'],
+                'name' => $person['name'],
+                'character' => $person['character'] ?? null,
+                'profile_path' => $person['profile_path'] ?? null,
+            ])->values()->all(),
+            'directors' => collect($credits['crew'] ?? [])
+                ->filter(fn (array $person) => ($person['job'] ?? null) === 'Director')
+                ->map(fn (array $person) => [
+                    'tmdb_id' => $person['id'],
+                    'name' => $person['name'],
+                    'profile_path' => $person['profile_path'] ?? null,
+                ])->values()->all(),
+        ];
+    }
+
+    protected function extractTvCredits(array $data): array
+    {
+        return [
+            'cast' => collect($data['aggregate_credits']['cast'] ?? [])->take(20)->map(fn (array $person) => [
+                'tmdb_id' => $person['id'],
+                'name' => $person['name'],
+                'character' => $person['roles'][0]['character'] ?? null,
+                'profile_path' => $person['profile_path'] ?? null,
+            ])->values()->all(),
+            'creators' => collect($data['created_by'] ?? [])->map(fn (array $person) => [
+                'tmdb_id' => $person['id'],
+                'name' => $person['name'],
+                'profile_path' => $person['profile_path'] ?? null,
+            ])->values()->all(),
+        ];
+    }
+}

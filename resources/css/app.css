@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body,
+html {
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/*
+ * Paleta Movieboxd — tokens extraídos del CSS de producción de Letterboxd.
+ * La app es dark-only (como Letterboxd): :root y .dark comparten la misma paleta.
+ * Fondo #14181C · superficies #283038/#2C3440 · texto #9AB · metadatos #678
+ * Acentos: verde #00E054 (watched) · naranja #FF8000 (like) · azul #40BCF4 (watchlist)
+ */
+@layer base {
+    :root,
+    .dark {
+        --background: 210 17% 9%;
+        --foreground: 210 20% 67%;
+        --card: 210 17% 19%;
+        --card-foreground: 210 20% 67%;
+        --popover: 216 19% 21%;
+        --popover-foreground: 210 100% 93%;
+        --primary: 130 100% 34%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 216 19% 21%;
+        --secondary-foreground: 210 100% 93%;
+        --muted: 216 19% 21%;
+        --muted-foreground: 210 14% 47%;
+        --accent: 210 19% 25%;
+        --accent-foreground: 0 0% 100%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 210 19% 25%;
+        --input: 216 19% 21%;
+        --ring: 199 89% 60%;
+        --chart-1: 143 100% 44%;
+        --chart-2: 30 100% 50%;
+        --chart-3: 199 89% 60%;
+        --chart-4: 210 20% 33%;
+        --chart-5: 210 14% 47%;
+        --radius: 0.25rem;
+        --sidebar-background: 210 17% 12%;
+        --sidebar-foreground: 210 20% 67%;
+        --sidebar-primary: 143 100% 44%;
+        --sidebar-primary-foreground: 210 17% 9%;
+        --sidebar-accent: 216 19% 21%;
+        --sidebar-accent-foreground: 210 100% 93%;
+        --sidebar-border: 210 19% 25%;
+        --sidebar-ring: 199 89% 60%;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply text-white;
+    }
+}
+
+@layer components {
+    /* Heading de sección estilo Letterboxd: 13px, uppercase, tracking amplio, gris */
+    .section-heading {
+        @apply text-[0.8125rem] font-normal uppercase tracking-[0.075em] text-lb-text;
+    }
+
+    .section-divider {
+        @apply border-t border-lb-line/40 pt-2;
+    }
+}
