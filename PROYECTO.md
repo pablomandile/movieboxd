@@ -128,8 +128,11 @@ Es la única API gratuita que cubre bien **películas Y series con temporadas y 
 - **Performance**: eliminados dos N+1 reales — (a) `likedByViewer` hacía un `exists()` por review al listar (ahora `ReviewController::likedReviewIds()` trae los likes del viewer en una sola query, usado en `popularFor` y en el tab de reseñas del perfil); (b) la `CommentPolicy` lazy-loadeaba `commentable` por cada comentario al calcular `canDelete` (ahora se setea la relación de antemano con `setRelation`, en review y lista).
 - 7 tests nuevos de estadísticas y filtro por año.
 
-### Nota de portabilidad
-Los tests corren en **SQLite en memoria** y producción en **MySQL**. `YEAR()` no existe en SQLite: usar `SUBSTR(fecha, 1, 4)` en `selectRaw`/`groupBy` (`whereYear` de Laravel sí es portable). Aplicado en `ProfileController::diary()` y `ProfileStatsService::perYear()`.
+### Notas de portabilidad
+
+**1. SQLite (tests) vs MySQL (producción).** `YEAR()` no existe en SQLite: usar `SUBSTR(fecha, 1, 4)` en `selectRaw`/`groupBy` (`whereYear` de Laravel sí es portable). Aplicado en `ProfileController::diary()` y `ProfileStatsService::perYear()`.
+
+**2. Case-sensitivity: Windows (local) vs Linux (GitHub Actions).** El default de `inertia-laravel` para ubicar los componentes en testing es `resource_path('js/Pages')` con **P mayúscula**, pero este proyecto usa `resources/js/pages` en minúscula. En Windows resuelve igual (filesystem case-insensitive); en Linux **fallan todos los tests con `assertInertia`** con `Inertia page component file [X] does not exist`. Solución: `config/inertia.php` publicado en el repo con el case real fijado en `page_paths` y `testing.page_paths`. Detalle del diagnóstico en la skill `.claude/skills/SKILL.md`.
 
 ### ✅ Módulo extra — Importador de Letterboxd (`/settings/import`)
 

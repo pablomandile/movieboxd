@@ -117,6 +117,8 @@ php artisan test
 
 La suite corre sobre SQLite en memoria y **nunca golpea la API real de TMDB** (todo usa `Http::fake()`). Formato de código: `vendor/bin/pint` (PHP) y `npm run lint` / `npm run format` (frontend).
 
+En GitHub Actions corren dos workflows en cada push a `main` o `develop`: `tests` (instala dependencias, build de assets y PHPUnit) y `linter` (Pint, Prettier y ESLint). Al ser Linux, el CI es **case-sensitive** a diferencia de Windows y macOS — ver la nota de portabilidad en [ARCHITECTURE.md §11](ARCHITECTURE.md#11-testing) antes de mover o renombrar archivos.
+
 ## Importar tus datos de Letterboxd
 
 1. En Letterboxd: Settings → Data → *Export your data* — descargá el ZIP.
