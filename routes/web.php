@@ -25,7 +25,6 @@ use App\Http\Controllers\TitleResolverController;
 use App\Http\Controllers\WatchedTitleController;
 use App\Http\Controllers\WatchlistController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('about', AboutController::class)->name('about');
@@ -54,9 +53,10 @@ Route::get('u/{user:username}/{tab}', [ProfileController::class, 'tab'])
 Route::get('lists', [ListController::class, 'index'])->name('lists.index');
 Route::get('list/{username}/{list}', [ListController::class, 'show'])->name('lists.show');
 
-Route::get('dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// El starter kit mandaba acá tras el login y mostraba una pantalla de andamiaje vacía.
+// La pantalla útil es la home (feed + tendencias); se mantiene la ruta por si quedó
+// algún enlace guardado.
+Route::redirect('dashboard', '/')->name('dashboard');
 
 // Trackeo (requiere sesión)
 Route::middleware(['auth', 'throttle:60,1'])->group(function () {

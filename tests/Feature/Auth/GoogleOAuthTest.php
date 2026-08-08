@@ -67,7 +67,7 @@ class GoogleOAuthTest extends TestCase
     {
         $this->fakeGoogleUser();
 
-        $this->get('/auth/google/callback')->assertRedirect('/dashboard');
+        $this->get('/auth/google/callback')->assertRedirect('/');
 
         $user = User::where('email', 'nuevo@gmail.com')->first();
 
@@ -102,7 +102,7 @@ class GoogleOAuthTest extends TestCase
 
         $this->fakeGoogleUser();
 
-        $this->get('/auth/google/callback')->assertRedirect('/dashboard');
+        $this->get('/auth/google/callback')->assertRedirect('/');
 
         $existing->refresh();
         $this->assertSame('1234567890', $existing->google_id);
@@ -145,7 +145,7 @@ class GoogleOAuthTest extends TestCase
         Setting::put('features.registration', false);
         $this->fakeGoogleUser();
 
-        $this->get('/auth/google/callback')->assertRedirect('/dashboard');
+        $this->get('/auth/google/callback')->assertRedirect('/');
 
         $this->assertAuthenticatedAs($user);
     }

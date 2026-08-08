@@ -101,7 +101,7 @@ class AdminPanelTest extends TestCase
         $this->assertDatabaseMissing('sessions', ['id' => 'session-of-target']);
 
         // El baneado ya no puede navegar
-        $this->actingAs($target->fresh())->get('/dashboard')->assertRedirect(route('login'));
+        $this->actingAs($target->fresh())->get('/diary')->assertRedirect(route('login'));
 
         // Y se puede revertir
         $this->actingAs($this->admin)->put("/admin/users/{$target->id}/ban");

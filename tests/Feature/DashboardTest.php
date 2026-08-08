@@ -12,16 +12,27 @@ class DashboardTest extends TestCase
 
     public function test_guests_are_redirected_to_the_login_page()
     {
-        $response = $this->get('/dashboard');
-        $response->assertRedirect('/login');
+        $this->get('/diary')->assertRedirect('/login');
     }
 
-    public function test_authenticated_users_can_visit_the_dashboard()
+    /**
+     * /dashboard era la pantalla de andamiaje del starter kit (placeholders vacíos).
+     * Ahora manda a la home, que es la pantalla con contenido real.
+     */
+    public function test_the_old_dashboard_url_redirects_to_the_home()
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
+        $this->get('/dashboard')->assertRedirect('/');
 
-        $response = $this->get('/dashboard');
-        $response->assertStatus(200);
+        $this->actingAs(User::factory()->create())
+            ->get('/dashboard')
+            ->assertRedirect('/');
+    }
+
+    public function test_authenticated_users_land_on_the_home_with_the_feed()
+    {
+        $this->actingAs(User::factory()->create())
+            ->get('/')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page->component('Home')->has('feed')->has('trending'));
     }
 }

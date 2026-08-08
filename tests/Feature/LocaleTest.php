@@ -26,7 +26,7 @@ class LocaleTest extends TestCase
 
         $this->assertSame('en', $user->fresh()->locale);
 
-        $this->actingAs($user)->get('/dashboard');
+        $this->actingAs($user)->get('/diary');
         $this->assertSame('en', app()->getLocale());
     }
 

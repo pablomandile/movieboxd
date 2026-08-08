@@ -34,7 +34,7 @@ class AdminAccessTest extends TestCase
     {
         $user = User::factory()->create(['banned_at' => now()]);
 
-        $this->actingAs($user)->get('/dashboard')->assertRedirect(route('login'));
+        $this->actingAs($user)->get('/diary')->assertRedirect(route('login'));
         $this->assertGuest();
     }
 }
