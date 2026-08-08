@@ -24,6 +24,14 @@ export default {
         profile: 'Profile',
         about: 'About',
     },
+    pwa: {
+        install: 'Install app',
+        close: 'Close',
+        iosStep1: 'Tap the Share button in the Safari toolbar.',
+        iosStep2: 'Choose "Add to Home Screen".',
+        menuStep1: 'Open the browser menu (the three dots).',
+        menuStep2: 'Choose "Install app" or "Add to Home screen".',
+    },
     about: {
         title: 'About',
         description: 'An app to log films and TV shows, and share them with your friends.',

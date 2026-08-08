@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import InstallAppButton from '@/components/InstallAppButton.vue';
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 import SiteLogo from '@/components/SiteLogo.vue';
 import UserMenuContent from '@/components/UserMenuContent.vue';
@@ -17,10 +18,13 @@ const { t } = useI18n();
 const page = usePage<SharedData>();
 const user = computed(() => page.props.auth.user);
 const searchQuery = ref('');
+const menuOpen = ref(false);
 
 function submitSearch() {
     const q = searchQuery.value.trim();
     if (!q) return;
+
+    menuOpen.value = false; // el sheet no se cierra solo al navegar por XHR
     router.get(route('search'), { q });
 }
 
@@ -39,10 +43,10 @@ const navItems = computed(() => {
 
 <template>
     <header class="border-b border-lb-line/30 bg-lb-bg">
-        <div class="mx-auto flex h-[72px] max-w-[1120px] items-center gap-4 px-4">
+        <div class="mx-auto flex h-[72px] max-w-[1120px] items-center gap-2 px-3 sm:gap-4 sm:px-4">
             <!-- Menú mobile -->
             <div class="lg:hidden">
-                <Sheet>
+                <Sheet v-model:open="menuOpen">
                     <SheetTrigger :as-child="true">
                         <Button variant="ghost" size="icon" class="h-9 w-9 text-lb-text">
                             <Menu class="h-5 w-5" />
@@ -53,7 +57,19 @@ const navItems = computed(() => {
                         <SheetHeader class="flex justify-start text-left">
                             <Link :href="route('home')"><SiteLogo /></Link>
                         </SheetHeader>
-                        <nav class="mt-6 flex flex-col space-y-1">
+
+                        <!-- Buscador: en la barra del header no entra en mobile -->
+                        <form @submit.prevent="submitSearch" class="relative mt-6">
+                            <Search class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-lb-muted" />
+                            <input
+                                v-model="searchQuery"
+                                type="search"
+                                :placeholder="t('nav.search')"
+                                class="h-10 w-full rounded-full border-0 bg-lb-surface pl-9 pr-3 text-sm text-white placeholder:text-lb-muted focus:outline-none focus:ring-2 focus:ring-lb-blue/70"
+                            />
+                        </form>
+
+                        <nav class="mt-4 flex flex-col space-y-1">
                             <Link
                                 v-for="item in navItems"
                                 :key="item.title"
@@ -64,9 +80,14 @@ const navItems = computed(() => {
                             </Link>
                         </nav>
 
+                        <!-- Instalar como PWA: acá siempre hay lugar para el texto completo -->
+                        <div class="mt-4 border-t border-lb-line/30 pt-4">
+                            <InstallAppButton inline />
+                        </div>
+
                         <!-- El selector de idioma vive acá en mobile: en el header no entra
                              junto a los botones de ingresar y registrarse -->
-                        <div class="mt-6 border-t border-lb-line/30 pt-4 sm:hidden">
+                        <div class="mt-2 border-t border-lb-line/30 pt-4 sm:hidden">
                             <p class="mb-1 px-3 text-xs font-semibold uppercase tracking-[0.075em] text-lb-muted">
                                 {{ t('locale.language') }}
                             </p>
@@ -110,6 +131,11 @@ const navItems = computed(() => {
                         {{ t('nav.log') }}
                     </Link>
                 </Button>
+
+                <!-- En mobile el botón vive dentro del menú hamburguesa (no entra acá) -->
+                <div class="hidden sm:block">
+                    <InstallAppButton />
+                </div>
 
                 <!-- En mobile vive dentro del menú hamburguesa. El wrapper es necesario:
                      DropdownMenu (radix) no propaga la clase a un elemento del DOM -->

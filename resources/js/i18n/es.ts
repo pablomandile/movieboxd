@@ -24,6 +24,14 @@ export default {
         profile: 'Perfil',
         about: 'Acerca de',
     },
+    pwa: {
+        install: 'Instalar app',
+        close: 'Cerrar',
+        iosStep1: 'Tocá el botón Compartir en la barra de Safari.',
+        iosStep2: 'Elegí «Agregar a inicio».',
+        menuStep1: 'Abrí el menú del navegador (los tres puntos).',
+        menuStep2: 'Elegí «Instalar aplicación» o «Agregar a pantalla principal».',
+    },
     about: {
         title: 'Acerca de',
         description: 'App para registrar y compartir con amigos películas y series.',

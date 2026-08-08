@@ -23,3 +23,16 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+<IfModule mod_mime.c>
+    AddType application/manifest+json .webmanifest
+</IfModule>
+
+# El navegador se entera de que hay una version nueva pegandole a estos dos
+# archivos. Si el CDN los cachea (Hostinger manda max-age=604800 por defecto),
+# ninguna actualizacion llega hasta que expire, y el SW congela todo lo demas.
+<IfModule mod_headers.c>
+    <FilesMatch "^(sw\.js|manifest\.webmanifest)$">
+        Header set Cache-Control "no-cache, must-revalidate, max-age=0"
+    </FilesMatch>
+</IfModule>
