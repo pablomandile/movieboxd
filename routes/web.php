@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DiaryEntryController;
@@ -27,6 +28,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('about', AboutController::class)->name('about');
 
 // Catálogo (público)
 Route::get('search', SearchController::class)->middleware('throttle:30,1')->name('search');

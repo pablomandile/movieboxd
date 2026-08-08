@@ -22,6 +22,12 @@ export default {
         loginShort: 'Ingresar',
         registerShort: 'Registro',
         profile: 'Perfil',
+        about: 'Acerca de',
+    },
+    about: {
+        title: 'Acerca de',
+        description: 'App para registrar y compartir con amigos películas y series.',
+        createdBy: 'Creado por',
     },
     actions: {
         watch: 'Ver',

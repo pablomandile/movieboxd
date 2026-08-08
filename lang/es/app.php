@@ -16,4 +16,6 @@ return [
     'oauth_email_unverified' => 'Google no confirmó que ese email sea tuyo. Verificalo en tu cuenta de Google e intentá otra vez.',
     'banned' => 'Tu cuenta está suspendida.',
     'confirm_username_mismatch' => 'El nombre de usuario no coincide.',
+    'about_title' => 'Acerca de',
+    'about_description' => 'App para registrar y compartir con amigos películas y series. Creada por Pablo Mandile.',
 ];

@@ -22,6 +22,12 @@ export default {
         loginShort: 'Sign in',
         registerShort: 'Sign up',
         profile: 'Profile',
+        about: 'About',
+    },
+    about: {
+        title: 'About',
+        description: 'An app to log films and TV shows, and share them with your friends.',
+        createdBy: 'Created by',
     },
     actions: {
         watch: 'Watch',

@@ -31,6 +31,8 @@ const navItems = computed(() => {
         items.push({ title: t('nav.diary'), href: route('diary.index') }, { title: t('nav.watchlist'), href: route('watchlist.index') });
     }
 
+    items.push({ title: t('nav.about'), href: route('about') });
+
     return items;
 });
 </script>
