@@ -9,4 +9,9 @@ return [
     'cannot_ban_self' => 'You cannot ban your own account.',
     'import_already_running' => 'An import is already running. Wait for it to finish.',
     'import_no_sections' => 'Pick at least one section to import.',
+    'oauth_failed' => 'We could not complete the Google sign-in. Please try again.',
+    'oauth_no_email' => 'Google did not share an email address with us.',
+    'oauth_email_unverified' => 'Google has not confirmed that this email is yours. Verify it in your Google account and try again.',
+    'banned' => 'Your account is suspended.',
+    'confirm_username_mismatch' => 'The username does not match.',
 ];

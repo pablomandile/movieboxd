@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import GoogleAuthButton from '@/components/GoogleAuthButton.vue';
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
@@ -37,6 +38,8 @@ const submit = () => {
         <div v-if="status" class="mb-4 text-center text-sm font-medium text-lb-green">
             {{ status }}
         </div>
+
+        <GoogleAuthButton class="mb-6" />
 
         <form @submit.prevent="submit" class="flex flex-col gap-6">
             <div class="grid gap-6">

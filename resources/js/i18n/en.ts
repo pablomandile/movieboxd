@@ -18,6 +18,9 @@ export default {
         logout: 'Log out',
         login: 'Sign in',
         register: 'Create account',
+        // Short versions for the mobile header, where the long text doesn't fit
+        loginShort: 'Sign in',
+        registerShort: 'Sign up',
         profile: 'Profile',
     },
     actions: {
@@ -204,6 +207,12 @@ export default {
         dontHaveAccount: "Don't have an account?",
         logIn: 'Log in',
         signUp: 'Sign up',
+        continueWithGoogle: 'Continue with Google',
+        or: 'or',
+        setPassword: 'Set a password',
+        setPasswordDescription: 'You sign in with Google. Setting a password lets you also sign in with your email.',
+        deleteWithoutPassword: 'Your account uses Google and has no password. Type your username ({username}) to confirm.',
+        confirmUsername: 'Username',
     },
     admin: {
         dashboard: 'Overview',

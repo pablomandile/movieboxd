@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Controllers\Auth\GoogleController;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -49,6 +50,10 @@ class HandleInertiaRequests extends Middleware
                 'user' => fn () => $request->user()?->only(
                     'id', 'name', 'username', 'email', 'avatar_path', 'role', 'locale', 'email_verified_at'
                 ),
+            ],
+            // El botón de Google solo aparece si hay credenciales cargadas
+            'oauth' => fn () => [
+                'google' => GoogleController::configured(),
             ],
         ]);
     }

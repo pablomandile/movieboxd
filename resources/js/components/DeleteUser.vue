@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import type { SharedData } from '@/types';
+import { useForm, usePage } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 // Components
 import HeadingSmall from '@/components/HeadingSmall.vue';
@@ -19,10 +21,18 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+const { t } = useI18n();
+const page = usePage<SharedData>();
+
+// Las cuentas de Google no tienen contraseña: se confirma escribiendo el usuario
+const props = withDefaults(defineProps<{ hasPassword?: boolean }>(), { hasPassword: true });
+const username = computed(() => page.props.auth.user?.username ?? '');
+
 const passwordInput = ref<HTMLInputElement | null>(null);
 
 const form = useForm({
     password: '',
+    confirm_username: '',
 });
 
 const deleteUser = (e: Event) => {
@@ -64,10 +74,23 @@ const closeModal = () => {
                             </DialogDescription>
                         </DialogHeader>
 
-                        <div class="grid gap-2">
+                        <div v-if="props.hasPassword" class="grid gap-2">
                             <Label for="password" class="sr-only">Password</Label>
                             <Input id="password" type="password" name="password" ref="passwordInput" v-model="form.password" placeholder="Password" />
                             <InputError :message="form.errors.password" />
+                        </div>
+
+                        <div v-else class="grid gap-2">
+                            <p class="text-sm text-muted-foreground">{{ t('auth.deleteWithoutPassword', { username }) }}</p>
+                            <Label for="confirm_username" class="sr-only">{{ t('auth.confirmUsername') }}</Label>
+                            <Input
+                                id="confirm_username"
+                                name="confirm_username"
+                                v-model="form.confirm_username"
+                                autocomplete="off"
+                                :placeholder="username"
+                            />
+                            <InputError :message="form.errors.confirm_username" />
                         </div>
 
                         <DialogFooter>

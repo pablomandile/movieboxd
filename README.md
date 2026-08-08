@@ -119,6 +119,28 @@ La suite corre sobre SQLite en memoria y **nunca golpea la API real de TMDB** (t
 
 En GitHub Actions corren dos workflows en cada push a `main` o `develop`: `tests` (instala dependencias, build de assets y PHPUnit) y `linter` (Pint, Prettier y ESLint). Al ser Linux, el CI es **case-sensitive** a diferencia de Windows y macOS — ver la nota de portabilidad en [ARCHITECTURE.md §11](ARCHITECTURE.md#11-testing) antes de mover o renombrar archivos.
 
+### Acceso con Google (opcional)
+
+Si no cargás estas credenciales, la app funciona igual: el botón «Continuar con Google» simplemente no aparece y las rutas `/auth/google/*` devuelven 404.
+
+1. Entrá a [Google Cloud Console](https://console.cloud.google.com/) y creá un proyecto (o elegí uno existente).
+2. **APIs y servicios → Pantalla de consentimiento de OAuth**: tipo *Externo*, completá nombre de la app, email de soporte y de contacto. Con la app en modo *Testing* solo entran las cuentas que agregues como usuarios de prueba; para abrirla a cualquiera hay que publicarla.
+3. **APIs y servicios → Credenciales → Crear credenciales → ID de cliente de OAuth**, tipo *Aplicación web*. En **URI de redireccionamiento autorizados** agregá exactamente:
+   - `https://tu-dominio/auth/google/callback` (producción)
+   - `http://localhost:8000/auth/google/callback` (desarrollo, si lo vas a probar en local)
+4. Copiá el *client ID* y el *client secret* al `.env`:
+
+```env
+GOOGLE_CLIENT_ID=xxxxxxxx.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=xxxxxxxx
+# Opcional: solo si el callback no es APP_URL/auth/google/callback
+# GOOGLE_REDIRECT_URI=https://tu-dominio/auth/google/callback
+```
+
+5. Si en el servidor tenés la config cacheada, corré `php artisan config:cache` para que tome los valores nuevos.
+
+Cómo se comporta: si el email de Google coincide con una cuenta existente, **se vincula** a ella (conservando su contraseña y su nombre de usuario); si no existe, crea la cuenta con el nombre y el avatar de Google, derivando el nombre de usuario del email. Una cuenta creada así **no tiene contraseña** y puede definir una desde Configuración → Password, lo que le habilita además el ingreso clásico. El alta respeta el flag de registro del panel de admin: con el registro cerrado, los usuarios existentes siguen entrando pero no se crean cuentas nuevas.
+
 ## Importar tus datos de Letterboxd
 
 1. En Letterboxd: Settings → Data → *Export your data* — descargá el ZIP.

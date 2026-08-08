@@ -40,4 +40,11 @@ return [
         'base_url' => env('TMDB_BASE_URL', 'https://api.themoviedb.org/3'),
     ],
 
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        // Sin valor en .env cae en la ruta canónica sobre APP_URL
+        'redirect' => env('GOOGLE_REDIRECT_URI', env('APP_URL').'/auth/google/callback'),
+    ],
+
 ];

@@ -144,6 +144,16 @@ Se descartó la alternativa de una tabla `activities` materializada (fan-out): e
 - **Settings**: tabla `settings` clave-valor con valores sensibles encriptados (la API key de TMDB). Los **feature flags** (registro, comentarios, listas, reseñas) viven ahí, se aplican con el middleware `feature:{flag}` en las rutas y se comparten al frontend como prop Inertia para ocultar la UI correspondiente.
 - **Moderación**: cualquier usuario reporta reseñas/comentarios/listas (un reporte pendiente por usuario y contenido); el admin resuelve desde una cola filtrable con «descartar» o «borrar contenido» (el borrado ajusta contadores vía observers).
 
+### 6.1 Autenticación con Google (OAuth)
+
+Implementada con **Laravel Socialite**. Las decisiones que importan son de seguridad, no de plomería:
+
+- **Vinculación por email con guardia de verificación.** Si el email de Google coincide con una cuenta existente, se vincula seteando `google_id`. Pero solo si Google declara el email como verificado (`email_verified` en el payload crudo): sin esa garantía, cualquiera que registre ese email en un proveedor OAuth podría reclamar una cuenta ajena. Vincular **nunca** toca la contraseña ni el `username` existentes.
+- **Cuentas sin contraseña.** `users.password` pasó a ser nullable, porque quien entra por Google no define una. Eso rompía dos flujos que la asumían presente, y ambos se adaptaron: cambiar contraseña deja de exigir la actual cuando no hay ninguna (y así el usuario se habilita el login clásico), y eliminar la cuenta se confirma escribiendo el propio nombre de usuario en lugar de la contraseña. Sin esto, una cuenta de Google no podría borrarse nunca.
+- **El feature flag de registro se respeta en el callback**, no en la ruta: con el registro cerrado, los usuarios ya existentes siguen entrando por Google, pero no se crean cuentas nuevas. Por eso las rutas OAuth no llevan el middleware `feature:registration`.
+- **Username derivado.** Google no provee uno y es parte de la URL del perfil, así que se deriva del email, se sanitiza y se desambigua con un sufijo numérico ante colisiones.
+- **Degradación limpia.** Sin credenciales en el `.env`, `GoogleController::configured()` devuelve false: las rutas responden 404 y el botón no se renderiza (se comparte como prop `oauth.google`). Es preferible a un 500 de Socialite por `client_id` vacío.
+
 ## 7. Internacionalización
 
 Dos capas coordinadas por el middleware `SetLocale` (prioridad: preferencia del usuario → sesión → `es`), con el locale compartido como prop Inertia:

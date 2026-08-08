@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
+use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -22,6 +23,16 @@ Route::middleware('guest')->group(function () {
         ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
+
+    // OAuth con Google. Sirve tanto para entrar como para registrarse, así que
+    // no lleva el middleware feature:registration (el alta se valida en el callback).
+    Route::get('auth/google/redirect', [GoogleController::class, 'redirect'])
+        ->middleware('throttle:10,1')
+        ->name('oauth.google.redirect');
+
+    Route::get('auth/google/callback', [GoogleController::class, 'callback'])
+        ->middleware('throttle:10,1')
+        ->name('oauth.google.callback');
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');

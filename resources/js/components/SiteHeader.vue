@@ -61,6 +61,15 @@ const navItems = computed(() => {
                                 {{ item.title }}
                             </Link>
                         </nav>
+
+                        <!-- El selector de idioma vive acá en mobile: en el header no entra
+                             junto a los botones de ingresar y registrarse -->
+                        <div class="mt-6 border-t border-lb-line/30 pt-4 sm:hidden">
+                            <p class="mb-1 px-3 text-xs font-semibold uppercase tracking-[0.075em] text-lb-muted">
+                                {{ t('locale.language') }}
+                            </p>
+                            <LanguageSwitcher inline />
+                        </div>
                     </SheetContent>
                 </Sheet>
             </div>
@@ -100,7 +109,11 @@ const navItems = computed(() => {
                     </Link>
                 </Button>
 
-                <LanguageSwitcher />
+                <!-- En mobile vive dentro del menú hamburguesa. El wrapper es necesario:
+                     DropdownMenu (radix) no propaga la clase a un elemento del DOM -->
+                <div class="hidden sm:block">
+                    <LanguageSwitcher />
+                </div>
 
                 <!-- Usuario -->
                 <template v-if="user">
@@ -137,18 +150,20 @@ const navItems = computed(() => {
                     </DropdownMenu>
                 </template>
                 <template v-else>
+                    <!-- Textos cortos en mobile para que entren los dos botones -->
                     <Link
                         :href="route('login')"
-                        class="whitespace-nowrap px-2 text-[0.8125rem] font-bold uppercase tracking-[0.075em] text-lb-text hover:text-white"
+                        class="whitespace-nowrap px-1.5 text-xs font-bold uppercase tracking-[0.05em] text-lb-text hover:text-white sm:px-2 sm:text-[0.8125rem] sm:tracking-[0.075em]"
                     >
-                        {{ t('nav.login') }}
+                        <span class="sm:hidden">{{ t('nav.loginShort') }}</span>
+                        <span class="hidden sm:inline">{{ t('nav.login') }}</span>
                     </Link>
-                    <!-- En mobile no entra junto a "iniciar sesión": la home ya tiene su propio CTA -->
                     <Link
                         :href="route('register')"
-                        class="hidden whitespace-nowrap rounded bg-lb-green-dark px-3 py-2 text-[0.8125rem] font-bold uppercase tracking-[0.075em] text-white hover:bg-lb-green sm:inline-block"
+                        class="whitespace-nowrap rounded bg-lb-green-dark px-2 py-2 text-xs font-bold uppercase tracking-[0.05em] text-white hover:bg-lb-green sm:px-3 sm:text-[0.8125rem] sm:tracking-[0.075em]"
                     >
-                        {{ t('nav.register') }}
+                        <span class="sm:hidden">{{ t('nav.registerShort') }}</span>
+                        <span class="hidden sm:inline">{{ t('nav.register') }}</span>
                     </Link>
                 </template>
             </div>

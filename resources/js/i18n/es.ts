@@ -18,6 +18,9 @@ export default {
         logout: 'Cerrar sesión',
         login: 'Iniciar sesión',
         register: 'Crear cuenta',
+        // Versiones cortas para el header en mobile, donde no entra el texto largo
+        loginShort: 'Ingresar',
+        registerShort: 'Registro',
         profile: 'Perfil',
     },
     actions: {
@@ -204,6 +207,12 @@ export default {
         dontHaveAccount: '¿No tenés cuenta?',
         logIn: 'Entrar',
         signUp: 'Registrate',
+        continueWithGoogle: 'Continuar con Google',
+        or: 'o',
+        setPassword: 'Definir contraseña',
+        setPasswordDescription: 'Entrás con Google. Si definís una contraseña vas a poder ingresar también con tu email.',
+        deleteWithoutPassword: 'Tu cuenta usa Google y no tiene contraseña. Escribí tu nombre de usuario ({username}) para confirmar.',
+        confirmUsername: 'Nombre de usuario',
     },
     admin: {
         dashboard: 'Resumen',

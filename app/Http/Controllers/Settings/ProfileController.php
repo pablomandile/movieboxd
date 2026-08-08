@@ -21,6 +21,7 @@ class ProfileController extends Controller
         return Inertia::render('settings/Profile', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
+            'hasPassword' => filled($request->user()->password),
         ]);
     }
 
@@ -45,11 +46,19 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $request->validate([
-            'password' => ['required', 'current_password'],
-        ]);
-
         $user = $request->user();
+
+        // Sin contraseña (cuenta de Google) se confirma escribiendo el usuario:
+        // pedir 'current_password' dejaría esas cuentas sin forma de borrarse.
+        if (filled($user->password)) {
+            $request->validate([
+                'password' => ['required', 'current_password'],
+            ]);
+        } else {
+            $request->validate([
+                'confirm_username' => ['required', 'string', 'in:'.$user->username],
+            ], ['confirm_username.in' => __('app.confirm_username_mismatch')]);
+        }
 
         Auth::logout();
 

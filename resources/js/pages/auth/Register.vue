@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import GoogleAuthButton from '@/components/GoogleAuthButton.vue';
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,8 @@ const submit = () => {
 <template>
     <AuthBase :title="t('auth.registerTitle')" :description="t('auth.registerDescription')">
         <Head :title="t('nav.register')" />
+
+        <GoogleAuthButton class="mb-6" />
 
         <form @submit.prevent="submit" class="flex flex-col gap-6">
             <div class="grid gap-6">

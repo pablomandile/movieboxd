@@ -12,11 +12,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { type BreadcrumbItem } from '@/types';
 
+import { useI18n } from 'vue-i18n';
+
 interface Props {
     className?: string;
+    // false para cuentas de Google que todavía no definieron una contraseña
+    hasPassword?: boolean;
 }
 
-defineProps<Props>();
+withDefaults(defineProps<Props>(), { hasPassword: true });
+
+const { t } = useI18n();
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
@@ -63,10 +69,16 @@ const updatePassword = () => {
 
         <SettingsLayout>
             <div class="space-y-6">
-                <HeadingSmall title="Update password" description="Ensure your account is using a long, random password to stay secure" />
+                <HeadingSmall
+                    :title="hasPassword ? 'Update password' : t('auth.setPassword')"
+                    :description="
+                        hasPassword ? 'Ensure your account is using a long, random password to stay secure' : t('auth.setPasswordDescription')
+                    "
+                />
 
                 <form @submit.prevent="updatePassword" class="space-y-6">
-                    <div class="grid gap-2">
+                    <!-- Sin contraseña previa (cuenta de Google) no hay nada que confirmar -->
+                    <div v-if="hasPassword" class="grid gap-2">
                         <Label for="current_password">Current Password</Label>
                         <Input
                             id="current_password"

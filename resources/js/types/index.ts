@@ -20,6 +20,7 @@ export interface SharedData {
     name: string;
     locale: 'es' | 'en';
     features: { comments: boolean; lists: boolean; reviews: boolean; registration: boolean };
+    oauth: { google: boolean };
     auth: Auth;
     ziggy: {
         location: string;

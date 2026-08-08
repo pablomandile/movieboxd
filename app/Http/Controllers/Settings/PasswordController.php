@@ -21,6 +21,9 @@ class PasswordController extends Controller
         return Inertia::render('settings/Password', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
+            // Quien entró con Google todavía no tiene contraseña: define una sin
+            // pedirle la anterior (no existe), lo que además le habilita el login clásico.
+            'hasPassword' => filled($request->user()->password),
         ]);
     }
 
@@ -29,8 +32,10 @@ class PasswordController extends Controller
      */
     public function update(Request $request): RedirectResponse
     {
+        $hasPassword = filled($request->user()->password);
+
         $validated = $request->validate([
-            'current_password' => ['required', 'current_password'],
+            'current_password' => [$hasPassword ? 'required' : 'nullable', 'current_password'],
             'password' => ['required', Password::defaults(), 'confirmed'],
         ]);
 

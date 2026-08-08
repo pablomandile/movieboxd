@@ -16,9 +16,10 @@ interface Props {
     mustVerifyEmail: boolean;
     status?: string;
     className?: string;
+    hasPassword?: boolean;
 }
 
-defineProps<Props>();
+withDefaults(defineProps<Props>(), { hasPassword: true });
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -105,7 +106,7 @@ const submit = () => {
                 </form>
             </div>
 
-            <DeleteUser />
+            <DeleteUser :has-password="hasPassword" />
         </SettingsLayout>
     </AppLayout>
 </template>
