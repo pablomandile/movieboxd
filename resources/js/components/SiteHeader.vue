@@ -66,7 +66,7 @@ const navItems = computed(() => {
             </div>
 
             <Link :href="route('home')" class="shrink-0">
-                <SiteLogo />
+                <SiteLogo compact />
             </Link>
 
             <!-- Nav desktop -->
@@ -137,12 +137,16 @@ const navItems = computed(() => {
                     </DropdownMenu>
                 </template>
                 <template v-else>
-                    <Link :href="route('login')" class="px-2 text-[0.8125rem] font-bold uppercase tracking-[0.075em] text-lb-text hover:text-white">
+                    <Link
+                        :href="route('login')"
+                        class="whitespace-nowrap px-2 text-[0.8125rem] font-bold uppercase tracking-[0.075em] text-lb-text hover:text-white"
+                    >
                         {{ t('nav.login') }}
                     </Link>
+                    <!-- En mobile no entra junto a "iniciar sesión": la home ya tiene su propio CTA -->
                     <Link
                         :href="route('register')"
-                        class="rounded bg-lb-green-dark px-3 py-2 text-[0.8125rem] font-bold uppercase tracking-[0.075em] text-white hover:bg-lb-green"
+                        class="hidden whitespace-nowrap rounded bg-lb-green-dark px-3 py-2 text-[0.8125rem] font-bold uppercase tracking-[0.075em] text-white hover:bg-lb-green sm:inline-block"
                     >
                         {{ t('nav.register') }}
                     </Link>

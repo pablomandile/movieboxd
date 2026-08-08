@@ -1,5 +1,8 @@
 <script setup lang="ts">
 // Logo Movieboxd: tres TVs retro con antenitas (teal/ámbar/coral) + wordmark
+// compact: en pantallas chicas muestra solo los TVs (el wordmark no entra en el header)
+withDefaults(defineProps<{ compact?: boolean }>(), { compact: false });
+
 const colors = ['#4ECDC4', '#FFC857', '#FF6B6B'];
 </script>
 
@@ -18,6 +21,6 @@ const colors = ['#4ECDC4', '#FFC857', '#FF6B6B'];
                 <circle cx="18.3" cy="16.4" r="1.1" fill="#14181C" />
             </svg>
         </span>
-        <span class="text-xl font-extrabold tracking-tight text-white">Movieboxd</span>
+        <span class="text-xl font-extrabold tracking-tight text-white" :class="compact ? 'hidden sm:inline' : ''">Movieboxd</span>
     </span>
 </template>
