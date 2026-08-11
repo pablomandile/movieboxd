@@ -7,7 +7,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { tmdbImage } from '@/lib/tmdb';
 import type { DiaryEntryItem, Paginated } from '@/types';
 import { Head, Link } from '@inertiajs/vue3';
-import { CalendarDays, Repeat } from 'lucide-vue-next';
+import { CalendarDays, MessageSquareText, Repeat } from 'lucide-vue-next';
 import { useI18n } from 'vue-i18n';
 
 const props = defineProps<{
@@ -72,6 +72,9 @@ const tabHref = (year: number | null) =>
                     <div class="mt-0.5 flex items-center gap-2">
                         <RatingStars v-if="entry.rating" :model-value="entry.rating" readonly size="sm" />
                         <Repeat v-if="entry.isRewatch" class="size-3.5 text-lb-muted" :title="t('diary.rewatch')" />
+                        <Link v-if="entry.reviewUrl" :href="entry.reviewUrl" class="text-lb-muted hover:text-lb-blue" :title="t('diary.hasReview')">
+                            <MessageSquareText class="size-3.5" />
+                        </Link>
                         <span v-for="tag in entry.tags" :key="tag" class="rounded-sm bg-lb-surface px-1.5 text-[10px] text-lb-muted">
                             {{ tag }}
                         </span>

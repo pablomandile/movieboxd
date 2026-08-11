@@ -125,6 +125,7 @@ Route::middleware(['auth', 'throttle:60,1'])->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('diary', [DiaryEntryController::class, 'index'])->name('diary.index');
     Route::get('watchlist', [WatchlistController::class, 'index'])->name('watchlist.index');
+    Route::get('watched', [WatchedTitleController::class, 'index'])->name('watched.index');
 });
 
 Route::put('settings/locale', [LocaleController::class, 'update'])->name('locale.update');

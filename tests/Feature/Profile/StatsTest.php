@@ -157,8 +157,13 @@ class StatsTest extends TestCase
         $user = User::factory()->create();
         $title = Title::factory()->create();
 
-        DiaryEntry::factory()->count(2)->create(['user_id' => $user->id, 'loggable_id' => $title->id, 'watched_on' => '2025-07-01']);
-        DiaryEntry::factory()->create(['user_id' => $user->id, 'loggable_id' => $title->id, 'watched_on' => '2026-02-14']);
+        // is_rewatch: al Diario solo entran reseñas y revisionados (DiaryEntry::scopeInDiary)
+        DiaryEntry::factory()->count(2)->create([
+            'user_id' => $user->id, 'loggable_id' => $title->id, 'watched_on' => '2025-07-01', 'is_rewatch' => true,
+        ]);
+        DiaryEntry::factory()->create([
+            'user_id' => $user->id, 'loggable_id' => $title->id, 'watched_on' => '2026-02-14', 'is_rewatch' => true,
+        ]);
 
         $this->get("/u/{$user->username}/diary")->assertInertia(
             fn (Assert $page) => $page

@@ -24,7 +24,8 @@ class DiaryEntryController extends Controller
     {
         $entries = $request->user()
             ->diaryEntries()
-            ->with(['loggable' => function ($morphTo) {
+            ->inDiary()
+            ->with(['review', 'loggable' => function ($morphTo) {
                 $morphTo->morphWith([
                     Season::class => ['title'],
                     Episode::class => ['title'],
@@ -173,6 +174,8 @@ class DiaryEntryController extends Controller
             'context' => $context,
             'url' => $url,
             'posterPath' => $posterPath,
+            // El Diario lista reseñas y revisionados: hay que poder distinguirlos
+            'reviewUrl' => $entry->review !== null ? route('reviews.show', $entry->review) : null,
         ];
     }
 }

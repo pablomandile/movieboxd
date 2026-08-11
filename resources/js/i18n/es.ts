@@ -10,6 +10,7 @@ export default {
         members: 'Miembros',
         search: 'Buscar',
         log: 'Registrar',
+        watched: 'Lo que vi',
         diary: 'Diario',
         watchlist: 'Watchlist',
         dashboard: 'Panel',
@@ -247,14 +248,20 @@ export default {
     diary: {
         title: 'Diario',
         empty: 'Tu diario está vacío',
-        emptyHint: 'Registrá lo que mirás con el botón «Registrar» de cada película o serie.',
+        emptyHint: 'El diario junta tus reseñas y tus revisionados. Todo lo que viste, con reseña o sin ella, está en «Lo que vi».',
         rewatch: 'Revisionado',
+        hasReview: 'Ver la reseña',
         confirmDelete: '¿Eliminar esta entrada del diario?',
         allYears: 'Todos',
     },
     watchlist: {
         empty: 'Tu watchlist está vacía',
         emptyHint: 'Marcá títulos con el reloj para guardarlos y verlos más tarde.',
+    },
+    watched: {
+        all: 'Todo',
+        empty: 'Todavía no marcaste nada como visto',
+        emptyHint: 'Marcá una película o serie como vista, o calificala: calificar ya la cuenta como vista.',
     },
     progress: {
         episodes: '{watched} de {total} episodios vistos',

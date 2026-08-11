@@ -32,7 +32,11 @@ const navItems = computed(() => {
     const items = [{ title: t('nav.lists'), href: route('lists.index') }];
 
     if (user.value) {
-        items.push({ title: t('nav.diary'), href: route('diary.index') }, { title: t('nav.watchlist'), href: route('watchlist.index') });
+        items.push(
+            { title: t('nav.watched'), href: route('watched.index') },
+            { title: t('nav.diary'), href: route('diary.index') },
+            { title: t('nav.watchlist'), href: route('watchlist.index') },
+        );
     }
 
     items.push({ title: t('nav.about'), href: route('about') });
@@ -107,7 +111,7 @@ const navItems = computed(() => {
                     v-for="item in navItems"
                     :key="item.title"
                     :href="item.href"
-                    class="rounded px-3 py-2 text-[0.8125rem] font-bold uppercase tracking-[0.075em] text-lb-text transition-colors hover:text-white"
+                    class="whitespace-nowrap rounded px-3 py-2 text-[0.8125rem] font-bold uppercase tracking-[0.075em] text-lb-text transition-colors hover:text-white"
                 >
                     {{ item.title }}
                 </Link>

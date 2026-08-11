@@ -10,6 +10,7 @@ export default {
         members: 'Members',
         search: 'Search',
         log: 'Log',
+        watched: 'Watched',
         diary: 'Diary',
         watchlist: 'Watchlist',
         dashboard: 'Dashboard',
@@ -247,14 +248,20 @@ export default {
     diary: {
         title: 'Diary',
         empty: 'Your diary is empty',
-        emptyHint: 'Log what you watch with the "Log" button on any film or show.',
+        emptyHint: 'The diary collects your reviews and rewatches. Everything you watched, reviewed or not, lives in "Watched".',
         rewatch: 'Rewatch',
+        hasReview: 'Read the review',
         confirmDelete: 'Delete this diary entry?',
         allYears: 'All',
     },
     watchlist: {
         empty: 'Your watchlist is empty',
         emptyHint: 'Mark titles with the clock to save them for later.',
+    },
+    watched: {
+        all: 'All',
+        empty: "You haven't marked anything as watched yet",
+        emptyHint: 'Mark a movie or show as watched, or rate it: rating already counts as watched.',
     },
     progress: {
         episodes: '{watched} of {total} episodes watched',

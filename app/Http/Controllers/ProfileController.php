@@ -43,8 +43,9 @@ class ProfileController extends Controller
         $year = $request->integer('year') ?: null;
 
         $entries = $user->diaryEntries()
+            ->inDiary()
             ->when($year, fn ($query) => $query->whereYear('watched_on', $year))
-            ->with(['loggable' => fn ($morphTo) => $morphTo->morphWith([
+            ->with(['review', 'loggable' => fn ($morphTo) => $morphTo->morphWith([
                 Season::class => ['title'],
                 Episode::class => ['title'],
             ])])
@@ -59,6 +60,7 @@ class ProfileController extends Controller
             'year' => $year,
             // SUBSTR en vez de YEAR(): portable entre MySQL y el SQLite de los tests
             'years' => $user->diaryEntries()
+                ->inDiary()
                 ->selectRaw('SUBSTR(watched_on, 1, 4) as year')
                 ->distinct()
                 ->orderByDesc('year')

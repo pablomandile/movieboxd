@@ -173,6 +173,7 @@ export interface DiaryEntryItem {
     context: string | null;
     url: string;
     posterPath: string | null;
+    reviewUrl: string | null;
 }
 
 export interface ReviewItem {
