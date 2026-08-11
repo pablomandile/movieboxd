@@ -22,7 +22,9 @@ class ProfileController extends Controller
     public function show(Request $request, User $user): Response
     {
         $titles = $user->watchedTitles()
+            // Desempate por id: ver la nota en WatchedTitleController::index
             ->orderByDesc('watched_titles.created_at')
+            ->orderByDesc('watched_titles.id')
             ->paginate(48);
 
         return Inertia::render('profile/Films', [

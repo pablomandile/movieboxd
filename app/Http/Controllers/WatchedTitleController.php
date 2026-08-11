@@ -26,7 +26,12 @@ class WatchedTitleController extends Controller
         $titles = $request->user()
             ->watchedTitles()
             ->when($type, fn ($query) => $query->where('titles.type', $type))
+            // Lo más reciente primero. El desempate por id no es cosmético: el
+            // import de Letterboxd deja cientos de títulos con la misma fecha, y
+            // un ORDER BY con empates + LIMIT/OFFSET es no determinístico
+            // (repite títulos entre páginas y saltea otros).
             ->orderByDesc('watched_titles.created_at')
+            ->orderByDesc('watched_titles.id')
             ->paginate(48)
             ->withQueryString();
 

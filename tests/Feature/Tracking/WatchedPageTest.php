@@ -4,6 +4,7 @@ namespace Tests\Feature\Tracking;
 
 use App\Models\Title;
 use App\Models\User;
+use App\Models\WatchedTitle;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -81,6 +82,55 @@ class WatchedPageTest extends TestCase
         $this->actingAs($user)->get('/watched?type=banana')->assertInertia(
             fn ($page) => $page->has('titles.data', 1)->where('type', null)
         );
+    }
+
+    public function test_the_most_recent_comes_first()
+    {
+        $user = User::factory()->create();
+
+        $viejo = Title::factory()->create();
+        $medio = Title::factory()->create();
+        $nuevo = Title::factory()->create();
+
+        foreach ([[$viejo, '2020-01-01'], [$nuevo, '2026-08-10'], [$medio, '2023-05-05']] as [$title, $date]) {
+            WatchedTitle::create([
+                'user_id' => $user->id, 'title_id' => $title->id,
+                'created_at' => $date, 'updated_at' => $date,
+            ]);
+        }
+
+        $this->actingAs($user)->get('/watched')->assertInertia(
+            fn ($page) => $page->where('titles.data.0.tmdbId', $nuevo->tmdb_id)
+                ->where('titles.data.1.tmdbId', $medio->tmdb_id)
+                ->where('titles.data.2.tmdbId', $viejo->tmdb_id)
+        );
+    }
+
+    /**
+     * El import de Letterboxd deja cientos de títulos con la misma fecha. Sin un
+     * desempate determinístico, LIMIT/OFFSET puede repetir y saltear títulos.
+     */
+    public function test_pagination_is_stable_when_dates_are_tied()
+    {
+        $user = User::factory()->create();
+
+        foreach (Title::factory()->count(60)->create() as $title) {
+            WatchedTitle::create([
+                'user_id' => $user->id, 'title_id' => $title->id,
+                'created_at' => '2020-04-05', 'updated_at' => '2020-04-05',
+            ]);
+        }
+
+        $ids = collect();
+
+        foreach ([1, 2] as $pagina) {
+            $response = $this->actingAs($user)->get("/watched?page={$pagina}");
+            $props = $response->viewData('page')['props'];
+            $ids = $ids->concat(collect($props['titles']['data'])->pluck('tmdbId'));
+        }
+
+        $this->assertCount(60, $ids, 'las dos páginas deben cubrir los 60 títulos');
+        $this->assertCount(60, $ids->unique(), 'ningún título puede repetirse entre páginas');
     }
 
     public function test_it_only_shows_your_own_watched_titles()
