@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { copyToClipboard } from '@/lib/clipboard';
 import type { SharedData } from '@/types';
 import { router, usePage } from '@inertiajs/vue3';
 import { Check, Copy, RefreshCw, UserPlus, X } from 'lucide-vue-next';
@@ -48,16 +49,16 @@ async function copy() {
 
     copyFailed.value = false;
 
-    try {
-        // Requiere contexto seguro (https o localhost)
-        await navigator.clipboard.writeText(inviteUrl.value);
+    if (await copyToClipboard(inviteUrl.value)) {
         copied.value = true;
         setTimeout(() => (copied.value = false), 2500);
-    } catch {
-        // Sin permiso de portapapeles: se selecciona el texto para copiar a mano
-        linkInput.value?.select();
-        copyFailed.value = true;
+
+        return;
     }
+
+    // Ni la API moderna ni execCommand: queda seleccionar el texto a mano
+    linkInput.value?.select();
+    copyFailed.value = true;
 }
 
 function revoke(collaborator: { id: number; name: string }) {

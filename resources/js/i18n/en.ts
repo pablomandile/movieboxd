@@ -24,6 +24,15 @@ export default {
         profile: 'Profile',
         about: 'About',
     },
+    share: {
+        action: 'Share',
+        title: 'Share',
+        copyLink: 'Copy link',
+        copied: 'Link copied!',
+        copyManually: 'We could not copy it automatically: select the link and copy it manually.',
+        email: 'Email',
+        more: 'More options…',
+    },
     pwa: {
         install: 'Install app',
         close: 'Close',

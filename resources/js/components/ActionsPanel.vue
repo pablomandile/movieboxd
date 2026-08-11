@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import LogModal from '@/components/LogModal.vue';
 import RatingStars from '@/components/RatingStars.vue';
+import ShareDialog from '@/components/ShareDialog.vue';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { TitleDetail, TitleViewer } from '@/types';
 import { Link, router } from '@inertiajs/vue3';
@@ -118,5 +119,8 @@ function addToList(listId: number) {
         <p v-else class="text-center text-sm text-lb-text">
             <Link :href="route('login')" class="font-semibold text-lb-blue hover:text-white">{{ t('actions.signInPrompt') }}</Link>
         </p>
+
+        <!-- Fuera del bloque autenticado: compartir no necesita sesión -->
+        <ShareDialog :title="title.year ? `${title.title} (${title.year})` : title.title" />
     </div>
 </template>

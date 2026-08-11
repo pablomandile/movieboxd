@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ListInviteDialog from '@/components/ListInviteDialog.vue';
 import PosterCard from '@/components/PosterCard.vue';
+import ShareDialog from '@/components/ShareDialog.vue';
 import UserAvatar from '@/components/UserAvatar.vue';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -110,6 +111,7 @@ function deleteComment(comment: CommentItem) {
                         {{ t('lists.edit') }}
                     </Link>
                     <ListInviteDialog v-if="list.isOwn" :list-id="list.id" :collaborators="list.collaborators" />
+                    <ShareDialog :title="list.name" variant="inline" />
                 </div>
             </div>
 

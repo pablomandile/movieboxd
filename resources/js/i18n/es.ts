@@ -24,6 +24,15 @@ export default {
         profile: 'Perfil',
         about: 'Acerca de',
     },
+    share: {
+        action: 'Compartir',
+        title: 'Compartir',
+        copyLink: 'Copiar enlace',
+        copied: '¡Enlace copiado!',
+        copyManually: 'No pudimos copiarlo solos: seleccioná el enlace y copialo a mano.',
+        email: 'Email',
+        more: 'Más opciones…',
+    },
     pwa: {
         install: 'Instalar app',
         close: 'Cerrar',
