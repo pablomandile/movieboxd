@@ -132,6 +132,7 @@ class TitleController extends Controller
             'runtime' => $title->runtime,
             'genres' => $title->genres ?? [],
             'credits' => $title->credits ?? [],
+            'watchProviders' => $title->watch_providers,
             'originalLanguage' => $title->original_language,
             'tvStatus' => $title->tv_status,
             'seasonsCount' => $title->seasons_count,

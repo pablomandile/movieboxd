@@ -38,6 +38,8 @@ return [
     'tmdb' => [
         'key' => env('TMDB_API_KEY'),
         'base_url' => env('TMDB_BASE_URL', 'https://api.themoviedb.org/3'),
+        // País para "dónde verlo". El panel de admin puede sobrescribirlo.
+        'watch_region' => env('TMDB_WATCH_REGION', 'AR'),
     ],
 
     'google' => [

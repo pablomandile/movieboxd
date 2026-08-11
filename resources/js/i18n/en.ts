@@ -24,6 +24,15 @@ export default {
         profile: 'Profile',
         about: 'About',
     },
+    watch: {
+        title: 'Where to watch',
+        flatrate: 'With subscription',
+        free: 'Free',
+        ads: 'Free with ads',
+        rent: 'Rent',
+        buy: 'Buy',
+        attribution: 'Availability data by JustWatch',
+    },
     share: {
         action: 'Share',
         title: 'Share',
@@ -314,6 +323,7 @@ export default {
     },
     footer: {
         tmdbAttribution: 'This product uses the TMDB API but is not endorsed or certified by TMDB.',
+        justwatchAttribution: 'Streaming availability data provided by',
         filmData: 'Film and TV data from',
     },
     locale: {

@@ -18,6 +18,11 @@ const year = new Date().getFullYear();
             <p class="mt-1 text-xs text-lb-muted">
                 {{ t('footer.tmdbAttribution') }}
             </p>
+            <!-- Condición de uso de los datos de disponibilidad -->
+            <p class="mt-1 text-xs text-lb-muted">
+                {{ t('footer.justwatchAttribution') }}
+                <a href="https://www.justwatch.com/" target="_blank" rel="noopener noreferrer" class="text-lb-blue hover:text-white">JustWatch</a>.
+            </p>
         </div>
     </footer>
 </template>

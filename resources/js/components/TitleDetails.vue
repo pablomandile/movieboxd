@@ -2,6 +2,7 @@
 import ActionsPanel from '@/components/ActionsPanel.vue';
 import RatingHistogram from '@/components/RatingHistogram.vue';
 import TitleHero from '@/components/TitleHero.vue';
+import WatchProviders from '@/components/WatchProviders.vue';
 import { tmdbImage } from '@/lib/tmdb';
 import type { TitleDetail, TitleViewer } from '@/types';
 import { Clock, Eye, Heart } from 'lucide-vue-next';
@@ -103,6 +104,7 @@ const cast = computed(() => (props.title.credits.cast ?? []).slice(0, 12));
             <!-- Sidebar -->
             <aside class="space-y-4">
                 <ActionsPanel :title="title" :viewer="viewer ?? null" />
+                <WatchProviders :providers="title.watchProviders" />
                 <RatingHistogram :histogram="title.ratings.histogram" :count="title.ratings.count" :average="title.ratings.average" />
                 <slot name="sidebar" />
             </aside>

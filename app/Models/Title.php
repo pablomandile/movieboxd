@@ -26,6 +26,8 @@ class Title extends Model
             'translations' => 'array',
             'genres' => 'array',
             'credits' => 'array',
+            'watch_providers' => 'array',
+            'watch_providers_synced_at' => 'datetime',
             'ratings_histogram' => 'array',
             'release_date' => 'date',
             'last_air_date' => 'date',

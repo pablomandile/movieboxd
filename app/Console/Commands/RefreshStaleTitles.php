@@ -33,7 +33,10 @@ class RefreshStaleTitles extends Command
                         $q->where('type', TitleType::Tv)
                             ->whereIn('tv_status', $airing)
                             ->where('synced_at', '<', now()->subDay());
-                    });
+                    })
+                    // Dónde verlo: los catálogos rotan todos los meses, así que
+                    // se refresca aunque la metadata siga vigente.
+                    ->orWhere('watch_providers_synced_at', '<', now()->subDays(7));
             });
 
         $count = 0;

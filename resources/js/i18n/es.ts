@@ -24,6 +24,15 @@ export default {
         profile: 'Perfil',
         about: 'Acerca de',
     },
+    watch: {
+        title: 'Dónde puedes verlo',
+        flatrate: 'Con suscripción',
+        free: 'Gratis',
+        ads: 'Gratis con avisos',
+        rent: 'Alquiler',
+        buy: 'Compra',
+        attribution: 'Datos de disponibilidad de JustWatch',
+    },
     share: {
         action: 'Compartir',
         title: 'Compartir',
@@ -314,6 +323,7 @@ export default {
     },
     footer: {
         tmdbAttribution: 'Este producto usa la API de TMDB pero no está avalado ni certificado por TMDB.',
+        justwatchAttribution: 'Los datos de dónde ver cada título son de',
         filmData: 'Datos de películas y series de',
     },
     locale: {

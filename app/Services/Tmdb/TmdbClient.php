@@ -56,14 +56,14 @@ class TmdbClient
     public function movie(int $tmdbId): array
     {
         return Cache::remember("tmdb:movie:{$tmdbId}", now()->addHour(), fn () => $this->get("/movie/{$tmdbId}", [
-            'append_to_response' => 'credits,translations',
+            'append_to_response' => 'credits,translations,watch/providers',
         ]));
     }
 
     public function tv(int $tmdbId): array
     {
         return Cache::remember("tmdb:tv:{$tmdbId}", now()->addHour(), fn () => $this->get("/tv/{$tmdbId}", [
-            'append_to_response' => 'aggregate_credits,translations',
+            'append_to_response' => 'aggregate_credits,translations,watch/providers',
         ]));
     }
 

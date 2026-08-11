@@ -67,6 +67,26 @@ export interface CrewMember {
     profile_path?: string | null;
 }
 
+export interface WatchProvider {
+    id: number;
+    name: string;
+    logo: string | null;
+}
+
+/** Dónde ver un título, para una región. Datos de JustWatch vía TMDB. */
+export interface WatchProviders {
+    region: string;
+    /** Página de JustWatch: enlazarla es condición de uso de los datos */
+    link: string | null;
+    offers: {
+        flatrate?: WatchProvider[];
+        free?: WatchProvider[];
+        ads?: WatchProvider[];
+        rent?: WatchProvider[];
+        buy?: WatchProvider[];
+    };
+}
+
 export interface TitleDetail {
     id: number;
     type: 'movie' | 'tv';
@@ -83,6 +103,7 @@ export interface TitleDetail {
     runtime: number | null;
     genres: { id: number; name: string }[];
     credits: { cast?: CastMember[]; directors?: CrewMember[]; creators?: CrewMember[] };
+    watchProviders: WatchProviders | null;
     originalLanguage: string | null;
     tvStatus: string | null;
     seasonsCount: number | null;

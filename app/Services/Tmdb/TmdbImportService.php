@@ -4,6 +4,7 @@ namespace App\Services\Tmdb;
 
 use App\Enums\TitleType;
 use App\Models\Season;
+use App\Models\Setting;
 use App\Models\Title;
 use Illuminate\Support\Str;
 
@@ -40,6 +41,8 @@ class TmdbImportService
             'runtime' => $data['runtime'] ?? null,
             'genres' => $data['genres'] ?? [],
             'credits' => $this->extractMovieCredits($data['credits'] ?? []),
+            'watch_providers' => $this->extractWatchProviders($data),
+            'watch_providers_synced_at' => now(),
             'original_language' => $data['original_language'] ?? null,
             'popularity' => $data['popularity'] ?? 0,
             'synced_at' => now(),
@@ -61,6 +64,8 @@ class TmdbImportService
             'release_date' => $data['first_air_date'] ?: null,
             'genres' => $data['genres'] ?? [],
             'credits' => $this->extractTvCredits($data),
+            'watch_providers' => $this->extractWatchProviders($data),
+            'watch_providers_synced_at' => now(),
             'original_language' => $data['original_language'] ?? null,
             'popularity' => $data['popularity'] ?? 0,
             'tv_status' => $data['status'] ?? null,
@@ -156,6 +161,50 @@ class TmdbImportService
         $slug = Str::slug($name) ?: (string) $tmdbId;
 
         return Title::where('slug', $slug)->exists() ? "{$slug}-{$tmdbId}" : $slug;
+    }
+
+    /**
+     * Dónde se puede ver, para la región configurada. Los datos son de JustWatch
+     * (vía TMDB) y su uso obliga a atribuirlos y a enlazar la página que viene
+     * en `link`; por eso el link se guarda junto con los proveedores.
+     *
+     * Se guarda solo la región elegida: el payload trae ~70 países y almacenarlos
+     * todos multiplicaría el tamaño del snapshot sin que se usen.
+     */
+    protected function extractWatchProviders(array $data): ?array
+    {
+        $region = strtoupper(Setting::get('watch.region', config('services.tmdb.watch_region', 'AR')));
+        $entry = $data['watch/providers']['results'][$region] ?? null;
+
+        if (! $entry) {
+            return null;
+        }
+
+        $map = fn (array $providers) => collect($providers)
+            ->sortBy('display_priority')
+            ->map(fn (array $provider) => [
+                'id' => $provider['provider_id'],
+                'name' => $provider['provider_name'],
+                'logo' => $provider['logo_path'] ?? null,
+            ])
+            ->values()
+            ->all();
+
+        // flatrate = incluido en la suscripción; ads/free = gratis con o sin avisos
+        $offers = collect(['flatrate', 'free', 'ads', 'rent', 'buy'])
+            ->mapWithKeys(fn (string $type) => [$type => $map($entry[$type] ?? [])])
+            ->filter(fn (array $providers) => $providers !== [])
+            ->all();
+
+        if ($offers === []) {
+            return null;
+        }
+
+        return [
+            'region' => $region,
+            'link' => $entry['link'] ?? null,
+            'offers' => $offers,
+        ];
     }
 
     /**
