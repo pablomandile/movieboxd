@@ -24,11 +24,14 @@ const cast = computed(() => (props.title.credits.cast ?? []).slice(0, 12));
 </script>
 
 <template>
-    <div class="relative">
+    <!-- -mt-8 cancela el padding superior del main: el backdrop arranca pegado
+         al header en vez de dejar una franja negra -->
+    <div class="relative" :class="title.backdropPath ? '-mt-8' : ''">
         <TitleHero :backdrop-path="title.backdropPath" />
 
-        <!-- El padding deja ver el backdrop detrás; en mobile el hero es más bajo -->
-        <div class="grid gap-8 md:grid-cols-[230px_1fr_230px]" :class="title.backdropPath ? 'pt-24 sm:pt-44 md:pt-64' : 'pt-4'">
+        <!-- relative z-10: por encima del backdrop, que ocupa el mismo espacio.
+             El padding deja verlo asomar; en mobile el hero es más bajo. -->
+        <div class="relative z-10 grid gap-8 md:grid-cols-[230px_1fr_230px]" :class="title.backdropPath ? 'pt-20 sm:pt-32 md:pt-44' : 'pt-4'">
             <!-- Póster + contadores de comunidad -->
             <div>
                 <div class="aspect-[2/3] w-full max-w-[230px] overflow-hidden rounded bg-lb-panel shadow-[inset_0_0_0_1px_rgba(221,238,255,0.075)]">
