@@ -33,6 +33,9 @@ export default {
         buy: 'Buy',
         attribution: 'Availability data by JustWatch',
     },
+    poster: {
+        expand: 'View larger image',
+    },
     share: {
         action: 'Share',
         title: 'Share',

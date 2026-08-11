@@ -33,6 +33,9 @@ export default {
         buy: 'Compra',
         attribution: 'Datos de disponibilidad de JustWatch',
     },
+    poster: {
+        expand: 'Ver la imagen en grande',
+    },
     share: {
         action: 'Compartir',
         title: 'Compartir',

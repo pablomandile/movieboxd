@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ActionsPanel from '@/components/ActionsPanel.vue';
+import PosterLightbox from '@/components/PosterLightbox.vue';
 import RatingHistogram from '@/components/RatingHistogram.vue';
 import TitleHero from '@/components/TitleHero.vue';
 import WatchProviders from '@/components/WatchProviders.vue';
@@ -35,8 +36,8 @@ const cast = computed(() => (props.title.credits.cast ?? []).slice(0, 12));
         <div class="relative z-10 grid gap-8 md:grid-cols-[230px_1fr_230px]" :class="title.backdropPath ? 'pt-20 sm:pt-32 md:pt-44' : 'pt-4'">
             <!-- Póster + contadores de comunidad -->
             <div>
-                <div class="aspect-[2/3] w-full max-w-[230px] overflow-hidden rounded bg-lb-panel shadow-[inset_0_0_0_1px_rgba(221,238,255,0.075)]">
-                    <img v-if="poster" :src="poster" :alt="title.title" class="h-full w-full object-cover" />
+                <div class="max-w-[230px]">
+                    <PosterLightbox :poster-path="title.posterPath" :alt="title.title" />
                 </div>
                 <div class="mt-2 flex max-w-[230px] items-center justify-center gap-4 text-xs text-lb-muted">
                     <span class="flex items-center gap-1" :title="t('actions.watched')">

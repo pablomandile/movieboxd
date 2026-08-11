@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import LogModal from '@/components/LogModal.vue';
+import PosterLightbox from '@/components/PosterLightbox.vue';
 import ProgressBar from '@/components/ProgressBar.vue';
 import RatingStars from '@/components/RatingStars.vue';
 import ReviewsSection from '@/components/ReviewsSection.vue';
@@ -50,13 +51,8 @@ function rate(value: number | null) {
 
         <div class="grid gap-8 md:grid-cols-[230px_1fr]">
             <div>
-                <div class="aspect-[2/3] w-full max-w-[230px] overflow-hidden rounded bg-lb-panel shadow-[inset_0_0_0_1px_rgba(221,238,255,0.075)]">
-                    <img
-                        v-if="season.posterPath || show.posterPath"
-                        :src="tmdbImage(season.posterPath ?? show.posterPath, 'w500')!"
-                        :alt="season.name"
-                        class="h-full w-full object-cover"
-                    />
+                <div class="max-w-[230px]">
+                    <PosterLightbox :poster-path="season.posterPath ?? show.posterPath" :alt="season.name" />
                 </div>
 
                 <template v-if="viewer">
