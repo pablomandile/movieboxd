@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Title;
+use App\Models\WatchedTitle;
 use App\Models\WatchlistItem;
 use App\Services\Tmdb\Dto\TitleCard;
 use Illuminate\Http\RedirectResponse;
@@ -33,7 +34,18 @@ class WatchlistController extends Controller
 
         $existing = WatchlistItem::where($keys)->first();
 
-        $existing === null ? WatchlistItem::create($keys) : $existing->delete();
+        if ($existing !== null) {
+            $existing->delete();
+
+            return back();
+        }
+
+        // La watchlist es "para ver más tarde": un título ya visto no entra
+        if (WatchedTitle::where($keys)->exists()) {
+            return back()->withErrors(['watchlist' => __('app.watchlist_watched')]);
+        }
+
+        WatchlistItem::create($keys);
 
         return back();
     }

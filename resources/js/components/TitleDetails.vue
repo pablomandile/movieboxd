@@ -40,8 +40,17 @@ const restCast = computed(() => cast.value.slice(4));
         <div class="relative z-10 grid gap-8 md:grid-cols-[230px_1fr_230px]" :class="title.backdropPath ? 'pt-20 sm:pt-32 md:pt-44' : 'pt-4'">
             <!-- Póster + contadores de comunidad -->
             <div>
-                <div class="max-w-[230px]">
+                <div class="relative max-w-[230px]">
                     <PosterLightbox :poster-path="title.posterPath" :alt="title.title" />
+                    <!-- Vista más de una vez: contador sobre la portada -->
+                    <span
+                        v-if="(viewer?.watchCount ?? 0) >= 2"
+                        class="pointer-events-none absolute left-2 top-2 z-10 inline-flex items-center gap-1 rounded-full bg-black/75 px-2 py-1 text-xs font-bold text-lb-green"
+                        :title="t('actions.watchedTimes', { count: viewer!.watchCount })"
+                    >
+                        <Eye class="size-3.5" />
+                        ×{{ viewer!.watchCount }}
+                    </span>
                 </div>
                 <div class="mt-2 flex max-w-[230px] items-center justify-center gap-4 text-xs text-lb-muted">
                     <span class="flex items-center gap-1" :title="t('actions.watched')">

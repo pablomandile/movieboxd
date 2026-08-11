@@ -93,6 +93,8 @@ export default {
         unmarkSeason: 'Desmarcar temporada',
         favorite: 'Favorito',
         addToList: 'Agregar a lista',
+        watchedTimes: 'Vista {count} veces',
+        watchlistBlocked: 'Ya la viste: la watchlist es para lo pendiente',
     },
     lists: {
         recent: 'Listas recientes',

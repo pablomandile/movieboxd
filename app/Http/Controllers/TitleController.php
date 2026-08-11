@@ -111,6 +111,11 @@ class TitleController extends Controller
                 ->where('rateable_id', $title->id)
                 ->value('value'),
             'hasLogged' => $title->diaryEntries()->where('user_id', $user->id)->exists(),
+            // Veces vista = registros del diario; una vista marcada sin log cuenta 1
+            'watchCount' => max(
+                $title->diaryEntries()->where('user_id', $user->id)->count(),
+                WatchedTitle::where('user_id', $user->id)->where('title_id', $title->id)->exists() ? 1 : 0
+            ),
         ];
     }
 

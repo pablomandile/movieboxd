@@ -140,6 +140,8 @@ export interface TitleViewer {
     inWatchlist: boolean;
     rating: number | null;
     hasLogged: boolean;
+    /** Veces vista (registros del diario; mínimo 1 si está marcada vista) */
+    watchCount: number;
 }
 
 export interface SeasonViewer {

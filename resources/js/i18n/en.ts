@@ -93,6 +93,8 @@ export default {
         unmarkSeason: 'Unmark season',
         favorite: 'Favorite',
         addToList: 'Add to list',
+        watchedTimes: 'Watched {count} times',
+        watchlistBlocked: "You've seen it: the watchlist is for what's pending",
     },
     lists: {
         recent: 'Recent lists',

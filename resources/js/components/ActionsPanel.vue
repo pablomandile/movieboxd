@@ -46,7 +46,15 @@ function addToList(listId: number) {
                     />
                     <span class="text-[11px] text-lb-muted">{{ t('actions.like') }}</span>
                 </button>
-                <button type="button" class="group flex flex-col items-center gap-1" @click="toggle('watchlist')">
+                <!-- Un título ya visto no entra a la watchlist -->
+                <button
+                    type="button"
+                    class="group flex flex-col items-center gap-1"
+                    :disabled="viewer.watched && !viewer.inWatchlist"
+                    :class="viewer.watched && !viewer.inWatchlist ? 'cursor-not-allowed opacity-40' : ''"
+                    :title="viewer.watched && !viewer.inWatchlist ? t('actions.watchlistBlocked') : undefined"
+                    @click="toggle('watchlist')"
+                >
                     <Clock class="size-8 transition-colors" :class="viewer.inWatchlist ? 'text-lb-blue' : 'text-lb-muted group-hover:text-white'" />
                     <span class="text-[11px] text-lb-muted">{{ t('actions.watchlist') }}</span>
                 </button>

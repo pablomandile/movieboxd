@@ -70,11 +70,11 @@ Tablas de trackeo: `watched_titles`, `episode_watches`, `diary_entries`, `rating
 
 Estas reglas, extraídas del comportamiento real de Letterboxd, son **invariantes del dominio** y están cubiertas por tests:
 
-1. **Watched, rating, like, review y diario son estados independientes y combinables.** El diario es una colección de eventos fechados, no un flag booleano.
+1. **Watched, rating, like, review y diario son estados combinables**, y el diario es una colección de eventos fechados, no un flag booleano. Con un acople deliberado (decisión propia, distinta de Letterboxd): **la primera calificación de un título implica haberlo visto** — crea el registro del diario, que a su vez marca la vista y la saca de la watchlist. Ajustar las estrellas después no duplica nada, y quitar la calificación no des-marca nada.
 2. Rating de 0.5 a 5 estrellas en medios pasos, guardado como **entero 1–10** (evita floats en agregaciones). El like (corazón) es independiente del rating.
 3. **Rewatch = nueva entrada de diario**, autodetectada si existe un log previo del mismo ítem. Cada entrada tiene su propio rating y reseña.
 4. Una reseña atada a un log genera **un solo ítem** en el feed (FK opcional `reviews.diary_entry_id`).
-5. **Watchlist única** por usuario; marcar como visto saca el título de la watchlist automáticamente (lo hace el observer).
+5. **Watchlist única** por usuario, y solo para pendientes: marcar como visto saca el título automáticamente (lo hace el observer) y **un título ya visto no puede entrar** (el endpoint lo rechaza y el botón se deshabilita).
 6. El feed muestra **solo** entradas de diario y reseñas — nunca watched/ratings sueltos.
 7. Perfil con máximo **4 favoritos** con posición.
 

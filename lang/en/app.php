@@ -13,6 +13,7 @@ return [
     'oauth_no_email' => 'Google did not share an email address with us.',
     'oauth_email_unverified' => 'Google has not confirmed that this email is yours. Verify it in your Google account and try again.',
     'banned' => 'Your account is suspended.',
+    'watchlist_watched' => 'You have already watched this title: the watchlist is only for pending ones.',
     'confirm_username_mismatch' => 'The username does not match.',
     'list_collaborator_joined' => 'You can now edit the list ":list".',
     'list_collaborator_revoked' => ':name can no longer edit the list.',

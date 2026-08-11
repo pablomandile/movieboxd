@@ -15,6 +15,7 @@ return [
     'oauth_no_email' => 'Google no compartió una dirección de email con nosotros.',
     'oauth_email_unverified' => 'Google no confirmó que ese email sea tuyo. Verificalo en tu cuenta de Google e intentá otra vez.',
     'banned' => 'Tu cuenta está suspendida.',
+    'watchlist_watched' => 'Ya viste este título: la watchlist es solo para pendientes.',
     'confirm_username_mismatch' => 'El nombre de usuario no coincide.',
     'list_collaborator_joined' => 'Ya podés editar la lista «:list».',
     'list_collaborator_revoked' => ':name ya no puede editar la lista.',
