@@ -94,14 +94,48 @@ class TmdbClient
      */
     public function trending(string $window = 'week', string $locale = 'es'): array
     {
-        $payload = Cache::remember("tmdb:trending:all:{$window}:{$locale}", now()->addHours(6), fn () => $this->get("/trending/all/{$window}", [
-            'language' => $this->language($locale),
-        ]));
+        // v2: se cachean 2 páginas ya fusionadas (una sola no llena 4 filas de 6)
+        $results = Cache::remember(
+            "tmdb:trending:all:v2:{$window}:{$locale}",
+            now()->addHours(6),
+            fn () => $this->trendingPages('all', $window, $locale)
+        );
 
         return array_values(array_filter(
-            $payload['results'] ?? [],
+            $results,
             fn (array $item) => in_array($item['media_type'] ?? null, ['movie', 'tv'], true)
         ));
+    }
+
+    /**
+     * Tendencias de un solo tipo (movie|tv), para las solapas de la home.
+     */
+    public function trendingType(string $type, string $window = 'week', string $locale = 'es'): array
+    {
+        $results = Cache::remember(
+            "tmdb:trending:{$type}:{$window}:{$locale}",
+            now()->addHours(6),
+            fn () => $this->trendingPages($type, $window, $locale)
+        );
+
+        // El union no pisa la clave si ya viene en el payload
+        return array_map(fn (array $item) => $item + ['media_type' => $type], $results);
+    }
+
+    protected function trendingPages(string $type, string $window, string $locale, int $pages = 2): array
+    {
+        $results = [];
+
+        for ($page = 1; $page <= $pages; $page++) {
+            $payload = $this->get("/trending/{$type}/{$window}", [
+                'language' => $this->language($locale),
+                'page' => $page,
+            ]);
+
+            $results = array_merge($results, $payload['results'] ?? []);
+        }
+
+        return $results;
     }
 
     protected function get(string $path, array $query = []): array
