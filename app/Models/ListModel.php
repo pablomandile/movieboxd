@@ -6,6 +6,7 @@ use Database\Factories\ListModelFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
@@ -19,7 +20,11 @@ class ListModel extends Model
 
     protected $table = 'lists';
 
-    protected $guarded = [];
+    /** invite_token nunca por mass assignment: solo se genera desde el controller del dueño. */
+    protected $guarded = ['id', 'invite_token'];
+
+    /** El token es la llave de edición: no puede viajar al frontend por accidente. */
+    protected $hidden = ['invite_token'];
 
     protected function casts(): array
     {
@@ -47,5 +52,27 @@ class ListModel extends Model
     public function comments(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    /** Usuarios invitados que pueden editar el contenido de la lista. */
+    public function collaborators(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'list_collaborators', 'list_id', 'user_id')->withTimestamps();
+    }
+
+    public function isOwnedBy(?User $user): bool
+    {
+        return $user !== null && $this->user_id === $user->id;
+    }
+
+    public function isCollaborator(?User $user): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+
+        return $this->relationLoaded('collaborators')
+            ? $this->collaborators->contains('id', $user->id)
+            : $this->collaborators()->whereKey($user->id)->exists();
     }
 }

@@ -21,6 +21,7 @@ export interface SharedData {
     locale: 'es' | 'en';
     features: { comments: boolean; lists: boolean; reviews: boolean; registration: boolean };
     oauth: { google: boolean };
+    flash: { status: string | null; inviteUrl: string | null };
     auth: Auth;
     ziggy: {
         location: string;

@@ -6,6 +6,7 @@ use App\Models\Comment;
 use App\Models\Like;
 use App\Models\ListItem;
 use App\Models\ListModel;
+use App\Models\User;
 use App\Models\WatchedTitle;
 use App\Services\Tmdb\Dto\TitleCard;
 use App\Support\PageMeta;
@@ -35,6 +36,9 @@ class ListController extends Controller
     public function show(Request $request, string $username, ListModel $list): Response
     {
         abort_unless($list->user->username === $username, 404);
+
+        // Antes de autorizar: la policy consulta los colaboradores en listas privadas
+        $list->load('collaborators');
 
         Gate::authorize('view', $list);
 
@@ -93,7 +97,11 @@ class ListController extends Controller
 
     public function edit(Request $request, ListModel $list): Response
     {
-        Gate::authorize('update', $list);
+        // Los colaboradores entran a gestionar títulos; el formulario de la lista
+        // se les oculta y el PUT sigue exigiendo ser dueño.
+        Gate::authorize('updateItems', $list);
+
+        $list->load('collaborators');
 
         return Inertia::render('lists/Edit', [
             'list' => $this->detailProps($list, $request->user()->id),
@@ -197,6 +205,16 @@ class ListController extends Controller
             'likedByViewer' => $viewerId !== null && $list->likes()->where('user_id', $viewerId)->exists(),
             'url' => route('lists.show', ['username' => $list->user->username, 'list' => $list->id]),
             'editUrl' => route('lists.edit', $list->id),
+            // Colaboración: el token no viaja nunca; el enlace se entrega bajo
+            // demanda por flash al tocar "Invitar".
+            'collaborators' => $list->collaborators->map(fn (User $collaborator) => [
+                'id' => $collaborator->id,
+                'name' => $collaborator->name,
+                'username' => $collaborator->username,
+                'avatar_path' => $collaborator->avatar_path,
+            ])->values(),
+            'canEditItems' => $viewerId !== null
+                && ($list->user_id === $viewerId || $list->collaborators->contains('id', $viewerId)),
         ];
     }
 }

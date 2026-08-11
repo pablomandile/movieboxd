@@ -55,6 +55,11 @@ class HandleInertiaRequests extends Middleware
             'oauth' => fn () => [
                 'google' => GoogleController::configured(),
             ],
+            'flash' => fn () => [
+                'status' => $request->session()->get('status'),
+                // Enlace de invitación: se entrega una sola vez, al pedirlo
+                'inviteUrl' => $request->session()->get('inviteUrl'),
+            ],
         ]);
     }
 }

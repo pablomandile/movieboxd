@@ -14,6 +14,8 @@ return [
     'oauth_email_unverified' => 'Google has not confirmed that this email is yours. Verify it in your Google account and try again.',
     'banned' => 'Your account is suspended.',
     'confirm_username_mismatch' => 'The username does not match.',
+    'list_collaborator_joined' => 'You can now edit the list ":list".',
+    'list_collaborator_revoked' => ':name can no longer edit the list.',
     'about_title' => 'About',
     'about_description' => 'An app to log films and TV shows, and share them with your friends. Created by Pablo Mandile.',
 ];

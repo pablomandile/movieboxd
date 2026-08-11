@@ -17,6 +17,8 @@ interface ListDetail {
     isRanked: boolean;
     isPublic: boolean;
     url: string;
+    isOwn: boolean;
+    user: { name: string; username: string };
 }
 
 interface Item {
@@ -70,13 +72,18 @@ function destroyList() {
                 <Link :href="list.url" class="text-xs font-semibold text-lb-blue hover:text-white">{{ t('lists.view') }}</Link>
             </div>
 
-            <div class="mt-6">
+            <!-- Solo el dueño cambia los datos de la lista; el invitado colabora
+                 con los títulos (el PUT lo rechaza igual si lo intentara) -->
+            <div v-if="list.isOwn" class="mt-6">
                 <ListForm
                     :initial="{ name: list.name, description: list.description, isRanked: list.isRanked, isPublic: list.isPublic }"
                     :submit-route="route('lists.update', list.id)"
                     method="put"
                 />
             </div>
+            <p v-else class="mt-4 rounded bg-lb-surface px-4 py-3 text-sm text-lb-text">
+                {{ t('lists.collaboratorNotice', { owner: list.user.name }) }}
+            </p>
 
             <div class="section-divider mt-10">
                 <h2 class="section-heading">{{ items.length }} {{ t('lists.titles') }}</h2>

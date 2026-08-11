@@ -9,6 +9,7 @@ use App\Http\Controllers\EpisodeWatchController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ListCollaboratorController;
 use App\Http\Controllers\ListController;
 use App\Http\Controllers\ListItemController;
 use App\Http\Controllers\ProfileController;
@@ -94,6 +95,18 @@ Route::middleware(['auth', 'throttle:60,1'])->group(function () {
         Route::put('lists/{list}/items/{item}', [ListItemController::class, 'update'])->name('lists.items.update');
         Route::delete('lists/{list}/items/{item}', [ListItemController::class, 'destroy'])->name('lists.items.destroy');
         Route::post('lists/{list}/reorder', [ListItemController::class, 'reorder'])->name('lists.reorder');
+
+        // Colaboración por enlace de invitación
+        Route::post('lists/{list}/invite', [ListCollaboratorController::class, 'invite'])->name('lists.invite');
+        Route::post('lists/{list}/invite/regenerate', [ListCollaboratorController::class, 'regenerate'])
+            ->name('lists.invite.regenerate');
+        Route::delete('lists/{list}/collaborators/{user}', [ListCollaboratorController::class, 'revoke'])
+            ->name('lists.collaborators.revoke');
+        // OJO: no usar 'list/...' — colisiona con list/{username}/{list} (lists.show),
+        // que matchearía primero tomando 'invite' como username.
+        // Sumarse requiere sesión: 'auth' del grupo padre manda a login y vuelve acá.
+        Route::get('lists/join/{token}', [ListCollaboratorController::class, 'accept'])
+            ->name('lists.invite.accept');
     });
     Route::post('lists/{list}/like', [ListController::class, 'toggleLike'])->name('lists.like');
     Route::post('lists/{list}/comments', [CommentController::class, 'storeForList'])

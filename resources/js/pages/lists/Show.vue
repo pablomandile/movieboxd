@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ListInviteDialog from '@/components/ListInviteDialog.vue';
 import PosterCard from '@/components/PosterCard.vue';
 import UserAvatar from '@/components/UserAvatar.vue';
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,8 @@ interface ListDetail {
     likedByViewer: boolean;
     url: string;
     editUrl: string;
+    collaborators: { id: number; name: string; username: string; avatar_path: string | null }[];
+    canEditItems: boolean;
 }
 
 interface Item {
@@ -97,14 +100,16 @@ function deleteComment(comment: CommentItem) {
                         />
                         {{ list.likesCount }}
                     </button>
+                    <!-- Los colaboradores invitados editan el contenido, no la lista -->
                     <Link
-                        v-if="list.isOwn"
+                        v-if="list.canEditItems"
                         :href="list.editUrl"
                         class="flex items-center gap-1.5 rounded bg-lb-surface px-3 py-1.5 text-xs text-lb-text hover:text-white"
                     >
                         <Pencil class="size-3.5" />
                         {{ t('lists.edit') }}
                     </Link>
+                    <ListInviteDialog v-if="list.isOwn" :list-id="list.id" :collaborators="list.collaborators" />
                 </div>
             </div>
 

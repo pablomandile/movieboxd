@@ -69,6 +69,18 @@ export default {
         dragHint: 'Drag to reorder.',
         confirmDelete: 'Delete this list? This cannot be undone.',
         confirmRemoveItem: 'Remove this title from the list?',
+        invite: 'Invite',
+        inviteTitle: 'Invite collaborators',
+        inviteHelp:
+            'Anyone who opens this link while signed in can add, remove and reorder titles in this list. Only you can rename it, edit its description or delete it.',
+        copy: 'Copy',
+        copied: 'Copied!',
+        copyManually: 'We could not copy it automatically: select the link and copy it manually.',
+        regenerateLink: 'Generate a new link (invalidates the old one)',
+        members: 'Can edit',
+        revoke: 'Remove',
+        confirmRevoke: 'Remove editing access for {name}?',
+        collaboratorNotice: "You are collaborating on {owner}'s list: you can add, remove and reorder titles.",
     },
     profile: {
         follow: 'Follow',

@@ -13,7 +13,7 @@ class ListItemController extends Controller
 {
     public function store(Request $request, ListModel $list): RedirectResponse
     {
-        Gate::authorize('update', $list);
+        Gate::authorize('updateItems', $list);
 
         $data = $request->validate([
             'title_id' => ['required', 'integer', 'exists:titles,id'],
@@ -38,7 +38,7 @@ class ListItemController extends Controller
 
     public function update(Request $request, ListModel $list, ListItem $item): RedirectResponse
     {
-        Gate::authorize('update', $list);
+        Gate::authorize('updateItems', $list);
         abort_unless($item->list_id === $list->id, 404);
 
         $data = $request->validate([
@@ -52,7 +52,7 @@ class ListItemController extends Controller
 
     public function destroy(ListModel $list, ListItem $item): RedirectResponse
     {
-        Gate::authorize('update', $list);
+        Gate::authorize('updateItems', $list);
         abort_unless($item->list_id === $list->id, 404);
 
         DB::transaction(function () use ($list, $item) {
@@ -72,7 +72,7 @@ class ListItemController extends Controller
      */
     public function reorder(Request $request, ListModel $list): RedirectResponse
     {
-        Gate::authorize('update', $list);
+        Gate::authorize('updateItems', $list);
 
         $data = $request->validate([
             'item_ids' => ['required', 'array'],

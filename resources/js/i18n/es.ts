@@ -69,6 +69,18 @@ export default {
         dragHint: 'Arrastrá para reordenar.',
         confirmDelete: '¿Eliminar esta lista? No se puede deshacer.',
         confirmRemoveItem: '¿Quitar este título de la lista?',
+        invite: 'Invitar',
+        inviteTitle: 'Invitar a colaborar',
+        inviteHelp:
+            'Quien abra este enlace con su cuenta va a poder agregar, quitar y reordenar títulos de la lista. Solo vos podés cambiar el nombre, la descripción o borrarla.',
+        copy: 'Copiar',
+        copied: '¡Copiado!',
+        copyManually: 'No pudimos copiarlo solos: seleccioná el enlace y copialo a mano.',
+        regenerateLink: 'Generar un enlace nuevo (invalida el anterior)',
+        members: 'Pueden editar',
+        revoke: 'Quitar',
+        confirmRevoke: '¿Quitarle la edición a {name}?',
+        collaboratorNotice: 'Estás colaborando en esta lista de {owner}: podés agregar, quitar y reordenar títulos.',
     },
     profile: {
         follow: 'Seguir',
