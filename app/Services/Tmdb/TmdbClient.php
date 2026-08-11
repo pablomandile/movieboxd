@@ -67,6 +67,17 @@ class TmdbClient
         ]));
     }
 
+    /**
+     * Persona con su filmografía completa. combined_credits mezcla cine y TV,
+     * que es justo lo que muestra la ficha.
+     */
+    public function person(int $tmdbId): array
+    {
+        return Cache::remember("tmdb:person:{$tmdbId}", now()->addHour(), fn () => $this->get("/person/{$tmdbId}", [
+            'append_to_response' => 'combined_credits,translations',
+        ]));
+    }
+
     public function tvSeason(int $tvTmdbId, int $seasonNumber): array
     {
         return Cache::remember(

@@ -12,6 +12,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ListCollaboratorController;
 use App\Http\Controllers\ListController;
 use App\Http\Controllers\ListItemController;
+use App\Http\Controllers\PersonController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ReportController;
@@ -46,6 +47,13 @@ Route::get('show/{title:slug}/season/{seasonNumber}/episode/{episodeNumber}', [E
     ->whereNumber('seasonNumber')
     ->whereNumber('episodeNumber')
     ->name('episodes.show');
+// Personas: mismo import on demand que los títulos
+Route::get('resolve/person/{tmdbId}', [PersonController::class, 'resolve'])
+    ->whereNumber('tmdbId')
+    ->middleware('throttle:30,1')
+    ->name('people.resolve');
+Route::get('person/{person:slug}', [PersonController::class, 'show'])->name('people.show');
+
 Route::get('review/{review}', [ReviewController::class, 'show'])->name('reviews.show');
 Route::get('u/{user:username}', [ProfileController::class, 'show'])->name('profiles.show');
 Route::get('u/{user:username}/{tab}', [ProfileController::class, 'tab'])

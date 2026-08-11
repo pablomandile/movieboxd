@@ -36,6 +36,28 @@ export default {
     poster: {
         expand: 'Ver la imagen en grande',
     },
+    person: {
+        creditsCount: 'Aparece en {count} títulos',
+        section: {
+            directing: 'Dirección',
+            acting: 'Actuación',
+            producing: 'Producción',
+            writing: 'Guion',
+        },
+        department: {
+            acting: 'Actuación',
+            directing: 'Dirección',
+            production: 'Producción',
+            writing: 'Guion',
+            sound: 'Sonido',
+            camera: 'Fotografía',
+            editing: 'Montaje',
+            art: 'Dirección de arte',
+            crew: 'Equipo técnico',
+            'visual effects': 'Efectos visuales',
+            'costume & make-up': 'Vestuario y maquillaje',
+        },
+    },
     share: {
         action: 'Compartir',
         title: 'Compartir',

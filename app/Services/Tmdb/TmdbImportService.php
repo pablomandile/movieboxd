@@ -3,6 +3,7 @@
 namespace App\Services\Tmdb;
 
 use App\Enums\TitleType;
+use App\Models\Person;
 use App\Models\Season;
 use App\Models\Setting;
 use App\Models\Title;
@@ -161,6 +162,117 @@ class TmdbImportService
         $slug = Str::slug($name) ?: (string) $tmdbId;
 
         return Title::where('slug', $slug)->exists() ? "{$slug}-{$tmdbId}" : $slug;
+    }
+
+    /**
+     * Importa (o refresca) una persona con su filmografía.
+     */
+    public function importPerson(int $tmdbId): Person
+    {
+        $data = $this->client->person($tmdbId);
+        $name = $data['name'] ?? (string) $tmdbId;
+
+        $person = Person::firstOrNew(['tmdb_id' => $tmdbId]);
+
+        $person->fill([
+            'name' => $name,
+            'profile_path' => $data['profile_path'] ?? null,
+            'biography' => $data['biography'] ?: null,
+            'translations' => $this->extractPersonTranslations($data),
+            'birthday' => $data['birthday'] ?: null,
+            'deathday' => $data['deathday'] ?: null,
+            'place_of_birth' => $data['place_of_birth'] ?? null,
+            'known_for_department' => $data['known_for_department'] ?? null,
+            'credits' => $this->extractFilmography($data['combined_credits'] ?? []),
+            'popularity' => $data['popularity'] ?? 0,
+            'synced_at' => now(),
+        ]);
+
+        // El slug se fija en el primer import y no se toca después: es su URL
+        $person->slug ??= $this->uniquePersonSlug($name, $tmdbId);
+        $person->save();
+
+        return $person;
+    }
+
+    /**
+     * Agrupa la filmografía por el rol que cumplió: actuación por un lado y
+     * los trabajos de equipo (dirección, producción, guion) por otro, que es
+     * como se muestra en la ficha.
+     */
+    protected function extractFilmography(array $credits): array
+    {
+        $map = fn (array $entry, ?string $role) => [
+            'tmdbId' => $entry['id'],
+            'type' => ($entry['media_type'] ?? 'movie') === 'tv' ? 'tv' : 'movie',
+            'title' => $entry['title'] ?? $entry['name'] ?? '',
+            'posterPath' => $entry['poster_path'] ?? null,
+            'year' => ($entry['release_date'] ?? $entry['first_air_date'] ?? null)
+                ? (int) substr($entry['release_date'] ?? $entry['first_air_date'], 0, 4)
+                : null,
+            'role' => $role ?: null,
+            'popularity' => $entry['popularity'] ?? 0,
+        ];
+
+        // Lo más reciente primero; sin fecha al final
+        $sort = fn ($items) => collect($items)
+            ->sortByDesc(fn (array $item) => $item['year'] ?? 0)
+            ->values()
+            ->all();
+
+        $acting = collect($credits['cast'] ?? [])
+            ->map(fn (array $entry) => $map($entry, $entry['character'] ?? null))
+            ->all();
+
+        // Un mismo título puede aparecer varias veces (varios episodios o cargos):
+        // se deja una sola entrada por título y rol.
+        $crewBy = function (callable $filter) use ($credits, $map) {
+            return collect($credits['crew'] ?? [])
+                ->filter($filter)
+                ->map(fn (array $entry) => $map($entry, $entry['job'] ?? null))
+                ->unique(fn (array $item) => $item['type'].$item['tmdbId'].$item['role'])
+                ->all();
+        };
+
+        $groups = [
+            'directing' => $crewBy(fn (array $c) => ($c['job'] ?? null) === 'Director'),
+            'acting' => $acting,
+            'producing' => $crewBy(fn (array $c) => ($c['department'] ?? null) === 'Production' && ($c['job'] ?? null) !== 'Director'),
+            'writing' => $crewBy(fn (array $c) => ($c['department'] ?? null) === 'Writing'),
+        ];
+
+        return collect($groups)
+            ->map($sort)
+            ->filter(fn (array $items) => $items !== [])
+            ->all();
+    }
+
+    protected function extractPersonTranslations(array $data): array
+    {
+        $out = [];
+
+        foreach ($data['translations']['translations'] ?? [] as $translation) {
+            $locale = $translation['iso_639_1'] ?? null;
+
+            if (! in_array($locale, ['es', 'en'], true)) {
+                continue;
+            }
+
+            $biography = $translation['data']['biography'] ?? null;
+
+            if ($biography) {
+                $out[$locale] = ['biography' => $biography];
+            }
+        }
+
+        return $out;
+    }
+
+    protected function uniquePersonSlug(string $name, int $tmdbId): string
+    {
+        $slug = Str::slug($name) ?: (string) $tmdbId;
+
+        return Person::where('slug', $slug)->exists() ? "{$slug}-{$tmdbId}" : $slug;
     }
 
     /**

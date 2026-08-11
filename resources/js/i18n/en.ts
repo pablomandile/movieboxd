@@ -36,6 +36,28 @@ export default {
     poster: {
         expand: 'View larger image',
     },
+    person: {
+        creditsCount: 'Appears in {count} titles',
+        section: {
+            directing: 'Directing',
+            acting: 'Acting',
+            producing: 'Production',
+            writing: 'Writing',
+        },
+        department: {
+            acting: 'Acting',
+            directing: 'Directing',
+            production: 'Production',
+            writing: 'Writing',
+            sound: 'Sound',
+            camera: 'Camera',
+            editing: 'Editing',
+            art: 'Art',
+            crew: 'Crew',
+            'visual effects': 'Visual effects',
+            'costume & make-up': 'Costume & make-up',
+        },
+    },
     share: {
         action: 'Share',
         title: 'Share',
