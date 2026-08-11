@@ -24,7 +24,12 @@ function onKeydown(event: KeyboardEvent) {
 // Mientras está abierta: sin scroll de fondo y Escape cierra
 watch(open, (isOpen) => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
-    isOpen ? window.addEventListener('keydown', onKeydown) : window.removeEventListener('keydown', onKeydown);
+
+    if (isOpen) {
+        window.addEventListener('keydown', onKeydown);
+    } else {
+        window.removeEventListener('keydown', onKeydown);
+    }
 });
 
 onUnmounted(() => {

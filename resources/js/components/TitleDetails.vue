@@ -18,7 +18,6 @@ const props = defineProps<{
 
 const { t } = useI18n();
 
-const poster = computed(() => tmdbImage(props.title.posterPath, 'w500'));
 const people = computed(() => {
     const credits = props.title.credits;
     return props.title.type === 'movie' ? (credits.directors ?? []) : (credits.creators ?? []);
