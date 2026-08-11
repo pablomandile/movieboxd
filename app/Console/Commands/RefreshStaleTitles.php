@@ -35,8 +35,14 @@ class RefreshStaleTitles extends Command
                             ->where('synced_at', '<', now()->subDay());
                     })
                     // Dónde verlo: los catálogos rotan todos los meses, así que
-                    // se refresca aunque la metadata siga vigente.
-                    ->orWhere('watch_providers_synced_at', '<', now()->subDays(7));
+                    // se refresca aunque la metadata siga vigente. El whereNull
+                    // no es redundante: en SQL `NULL < fecha` no es verdadero,
+                    // así que sin él los títulos anteriores a esta función
+                    // (que lo tienen en NULL) no se refrescarían nunca.
+                    ->orWhere(function ($q) {
+                        $q->whereNull('watch_providers_synced_at')
+                            ->orWhere('watch_providers_synced_at', '<', now()->subDays(7));
+                    });
             });
 
         $count = 0;

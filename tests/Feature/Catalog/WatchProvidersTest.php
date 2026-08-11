@@ -127,6 +127,22 @@ class WatchProvidersTest extends TestCase
             );
     }
 
+    public function test_titles_imported_before_this_feature_are_refreshed()
+    {
+        // watch_providers_synced_at en NULL: sin un whereNull explícito, la
+        // comparación `NULL < fecha` los dejaría fuera para siempre
+        $title = Title::factory()->create([
+            'synced_at' => now(),
+            'watch_providers_synced_at' => null,
+        ]);
+
+        Queue::fake();
+
+        $this->artisan('movieboxd:refresh-stale')->assertSuccessful();
+
+        Queue::assertPushed(RefreshTitle::class, fn ($job) => $job->title->is($title));
+    }
+
     public function test_stale_availability_is_refreshed_even_if_the_metadata_is_fresh()
     {
         // Metadata al día, disponibilidad vencida: los catálogos rotan más rápido
