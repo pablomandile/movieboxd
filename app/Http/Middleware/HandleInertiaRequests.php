@@ -4,8 +4,11 @@ namespace App\Http\Middleware;
 
 use App\Http\Controllers\Auth\GoogleController;
 use App\Models\Setting;
+use Closure;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Inertia\Support\Header;
+use Symfony\Component\HttpFoundation\Response;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -17,6 +20,39 @@ class HandleInertiaRequests extends Middleware
      * @var string
      */
     protected $rootView = 'app';
+
+    /**
+     * Una misma URL contesta HTML o JSON según el header X-Inertia, y lo único
+     * que se lo dice a una caché es el Vary. El CDN de Hostinger lo reescribe, y
+     * cuando comprime con brotli —lo que pide cualquier navegador real— lo borra
+     * entero: las dos respuestas quedan bajo la misma clave. Si además se pueden
+     * guardar, al restaurar una pestaña descartada el navegador reusa la entrada
+     * JSON sin revalidar y el usuario ve el JSON crudo en pantalla.
+     *
+     * Va acá y no en un middleware aparte: el de Inertia setea el Vary y puede
+     * reemplazar la respuesta entera en onVersionChange(), y cualquier middleware
+     * posterior del grupo web corre su salida antes y quedaría pisado.
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        $response = parent::handle($request, $next);
+
+        // El CDN lo borra, pero se declara igual: es lo correcto y lo respeta
+        // cualquier otro intermediario.
+        $response->headers->set('Vary', Header::INERTIA.', Accept-Encoding');
+
+        // no-store, no no-cache: no-cache permite guardar y solo obliga a
+        // revalidar, y la navegación de historial saltea la revalidación.
+        //
+        // Y solo sobre la respuesta XHR, nunca sobre el HTML: no-store en el
+        // documento principal desactiva el back/forward cache de Chrome y
+        // convierte cada "atrás" en una ida completa a la red.
+        if ($request->header(Header::INERTIA)) {
+            $response->headers->set('Cache-Control', 'no-store, private');
+        }
+
+        return $response;
+    }
 
     /**
      * Determines the current asset version.
