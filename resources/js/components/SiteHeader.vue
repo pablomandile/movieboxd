@@ -62,18 +62,7 @@ const navItems = computed(() => {
                             <Link :href="route('home')"><SiteLogo /></Link>
                         </SheetHeader>
 
-                        <!-- Buscador: en la barra del header no entra en mobile -->
-                        <form @submit.prevent="submitSearch" class="relative mt-6">
-                            <Search class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-lb-muted" />
-                            <input
-                                v-model="searchQuery"
-                                type="search"
-                                :placeholder="t('nav.search')"
-                                class="h-10 w-full rounded-full border-0 bg-lb-surface pl-9 pr-3 text-sm text-white placeholder:text-lb-muted focus:outline-none focus:ring-2 focus:ring-lb-blue/70"
-                            />
-                        </form>
-
-                        <nav class="mt-4 flex flex-col space-y-1">
+                        <nav class="mt-6 flex flex-col space-y-1">
                             <Link
                                 v-for="item in navItems"
                                 :key="item.title"
@@ -117,14 +106,14 @@ const navItems = computed(() => {
                 </Link>
             </nav>
 
-            <div class="ml-auto flex items-center gap-2">
-                <form @submit.prevent="submitSearch" class="relative hidden sm:block">
+            <div class="ml-auto flex min-w-0 flex-1 items-center justify-end gap-2 sm:flex-none">
+                <form @submit.prevent="submitSearch" class="relative min-w-0 flex-1 sm:flex-none">
                     <Search class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-lb-muted" />
                     <input
                         v-model="searchQuery"
                         type="search"
                         :placeholder="t('nav.search')"
-                        class="h-9 w-40 rounded-full border-0 bg-lb-surface pl-9 pr-3 text-sm text-white transition-all placeholder:text-lb-muted focus:w-56 focus:outline-none focus:ring-2 focus:ring-lb-blue/70"
+                        class="h-9 w-full min-w-0 rounded-full sm:w-40 border-0 bg-lb-surface pl-9 pr-3 text-sm text-white transition-all placeholder:text-lb-muted sm:focus:w-56 focus:outline-none focus:ring-2 focus:ring-lb-blue/70"
                     />
                 </form>
 
