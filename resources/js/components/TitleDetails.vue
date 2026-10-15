@@ -22,8 +22,8 @@ const people = computed(() => {
     const credits = props.title.credits;
     return props.title.type === 'movie' ? (credits.directors ?? []) : (credits.creators ?? []);
 });
-const cast = computed(() => (props.title.credits.cast ?? []).slice(0, 12));
-// Los cuatro primeros van destacados con foto; el resto, solo el nombre
+const cast = computed(() => props.title.credits.cast ?? []);
+// Los cuatro primeros van destacados con foto; el resto, en lista con foto chica
 const leadCast = computed(() => cast.value.slice(0, 4));
 const restCast = computed(() => cast.value.slice(4));
 </script>
@@ -125,18 +125,33 @@ const restCast = computed(() => cast.value.slice(4));
                         </Link>
                     </div>
 
-                    <!-- El resto, solo el nombre -->
-                    <div v-if="restCast.length" class="mt-3 flex flex-wrap gap-2">
-                        <Link
-                            v-for="member in restCast"
-                            :key="member.tmdb_id"
-                            :href="route('people.resolve', member.tmdb_id)"
-                            class="rounded-sm bg-lb-surface px-2 py-1 text-xs text-lb-bright hover:text-lb-blue"
-                            :title="member.character ?? undefined"
-                        >
-                            {{ member.name }}
-                        </Link>
-                    </div>
+                    <!-- El resto: lista con foto chica adelante del nombre -->
+                    <ul v-if="restCast.length" class="mt-4 grid gap-x-4 gap-y-2 sm:grid-cols-2">
+                        <li v-for="member in restCast" :key="member.tmdb_id">
+                            <Link :href="route('people.resolve', member.tmdb_id)" class="group flex items-center gap-3">
+                                <img
+                                    v-if="member.profile_path"
+                                    :src="tmdbImage(member.profile_path, 'w185')!"
+                                    :alt="member.name"
+                                    loading="lazy"
+                                    class="size-10 shrink-0 rounded-full bg-lb-panel object-cover"
+                                />
+                                <span
+                                    v-else
+                                    class="flex size-10 shrink-0 items-center justify-center rounded-full bg-lb-surface text-xs font-semibold text-lb-muted"
+                                    aria-hidden="true"
+                                >
+                                    {{ member.name.charAt(0) }}
+                                </span>
+                                <span class="min-w-0">
+                                    <span class="block truncate text-sm font-semibold text-lb-bright group-hover:text-lb-blue">{{ member.name }}</span>
+                                    <span v-if="member.character" class="block truncate text-xs text-lb-muted" :title="member.character">
+                                        {{ member.character }}
+                                    </span>
+                                </span>
+                            </Link>
+                        </li>
+                    </ul>
                 </template>
 
                 <!-- Contenido específico del tipo (ej: temporadas) -->
