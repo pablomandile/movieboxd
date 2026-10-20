@@ -3,6 +3,7 @@
 namespace Tests\Feature\Catalog;
 
 use App\Models\Title;
+use App\Services\Tmdb\TmdbImportService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -54,6 +55,19 @@ class TmdbImportTest extends TestCase
         $this->assertSame('Breaking Bad', $title->title);
         $this->assertCount(2, $title->seasons);
         $this->assertNull($title->seasons->first()->synced_at);
+    }
+
+    public function test_movie_detail_payload_is_not_cached()
+    {
+        // El detalle ya se persiste como snapshot: cachearlo solo inflaba la tabla cache
+        Http::fake([
+            '*/movie/603*' => Http::response($this->moviePayload()),
+        ]);
+
+        app(TmdbImportService::class)->importMovie(603);
+        app(TmdbImportService::class)->importMovie(603);
+
+        Http::assertSentCount(2);
     }
 
     public function test_visiting_an_imported_title_does_not_call_tmdb()

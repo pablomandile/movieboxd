@@ -10,8 +10,9 @@ use Illuminate\Support\Facades\Http;
  * Cliente HTTP crudo contra la API v3 de TMDB.
  *
  * La API key vive solo en el backend (config/services.php ← .env).
- * Las respuestas crudas se cachean en la Cache de Laravel para absorber
- * ráfagas; la persistencia real es el snapshot en MySQL (TmdbImportService).
+ * Solo se cachean búsquedas y tendencias, para absorber ráfagas. Los detalles
+ * (película, serie, temporada, persona) no: pesan cientos de KB y ya quedan
+ * persistidos como snapshot en MySQL (TmdbImportService).
  */
 class TmdbClient
 {
@@ -55,16 +56,16 @@ class TmdbClient
 
     public function movie(int $tmdbId): array
     {
-        return Cache::remember("tmdb:movie:{$tmdbId}", now()->addHour(), fn () => $this->get("/movie/{$tmdbId}", [
+        return $this->get("/movie/{$tmdbId}", [
             'append_to_response' => 'credits,translations,watch/providers',
-        ]));
+        ]);
     }
 
     public function tv(int $tmdbId): array
     {
-        return Cache::remember("tmdb:tv:{$tmdbId}", now()->addHour(), fn () => $this->get("/tv/{$tmdbId}", [
+        return $this->get("/tv/{$tmdbId}", [
             'append_to_response' => 'aggregate_credits,translations,watch/providers',
-        ]));
+        ]);
     }
 
     /**
@@ -73,20 +74,16 @@ class TmdbClient
      */
     public function person(int $tmdbId): array
     {
-        return Cache::remember("tmdb:person:{$tmdbId}", now()->addHour(), fn () => $this->get("/person/{$tmdbId}", [
+        return $this->get("/person/{$tmdbId}", [
             'append_to_response' => 'combined_credits,translations',
-        ]));
+        ]);
     }
 
     public function tvSeason(int $tvTmdbId, int $seasonNumber): array
     {
-        return Cache::remember(
-            "tmdb:tv:{$tvTmdbId}:season:{$seasonNumber}",
-            now()->addHour(),
-            fn () => $this->get("/tv/{$tvTmdbId}/season/{$seasonNumber}", [
-                'append_to_response' => 'translations',
-            ])
-        );
+        return $this->get("/tv/{$tvTmdbId}/season/{$seasonNumber}", [
+            'append_to_response' => 'translations',
+        ]);
     }
 
     /**
