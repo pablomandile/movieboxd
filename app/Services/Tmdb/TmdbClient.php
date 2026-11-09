@@ -41,16 +41,17 @@ class TmdbClient
      * Búsqueda de películas por título (y año opcional). Usada por el
      * importador de Letterboxd: los nombres del export vienen en inglés.
      */
-    public function searchMovie(string $query, ?int $year = null, int $page = 1): array
+    public function searchMovie(string $query, ?int $year = null, int $page = 1, string $language = 'en-US'): array
     {
-        $key = 'tmdb:search-movie:'.md5($query).':'.($year ?? 'any').':'.$page;
+        // Sin el idioma en la clave para en-US: así siguen valiendo las búsquedas ya cacheadas.
+        $key = 'tmdb:search-movie:'.md5($query).':'.($year ?? 'any').':'.$page.($language === 'en-US' ? '' : ':'.$language);
 
         return Cache::remember($key, now()->addDay(), fn () => $this->get('/search/movie', array_filter([
             'query' => $query,
             'primary_release_year' => $year,
             'page' => $page,
             'include_adult' => 'false',
-            'language' => 'en-US',
+            'language' => $language,
         ], fn ($value) => $value !== null)));
     }
 

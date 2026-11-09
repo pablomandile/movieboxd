@@ -266,6 +266,27 @@ export default {
     progress: {
         episodes: '{watched} of {total} episodes watched',
     },
+    apiTokens: {
+        title: 'API',
+        description: 'Tokens that let other apps (for example, Hoy Trasnoche) add films to your watchlist.',
+        name: 'Token name',
+        namePlaceholder: 'Hoy Trasnoche',
+        create: 'Create token',
+        newTokenTitle: 'Copy the token now',
+        newTokenBody: 'This is the only time it is shown. If you lose it, revoke it and create another one.',
+        copy: 'Copy',
+        copied: 'Copied',
+        list: 'Active tokens',
+        empty: 'You have not created any token yet.',
+        lastUsed: 'Last used: {date}',
+        neverUsed: 'Not used yet',
+        revoke: 'Revoke',
+        revokeConfirm: 'Revoke the token “{name}”? The app using it will stop working.',
+        docsTitle: 'How to use it',
+        docsBody:
+            'Send the token in the Authorization: Bearer <token> header. Endpoints: GET /me, GET /match?title=&alt=&year=, POST /watchlist with tmdb_id and DELETE /watchlist/{tmdb_id}.',
+        demoBody: 'API tokens can’t be created in the demo. In your own account, a token lets another app add films to your watchlist.',
+    },
     demo: {
         title: 'Try the demo',
         description: 'A year and a half of diary, reviews, lists and friends who comment. It resets every night.',

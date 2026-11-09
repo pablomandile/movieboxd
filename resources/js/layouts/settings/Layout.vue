@@ -22,6 +22,10 @@ const sidebarNavItems: NavItem[] = [
         title: 'Letterboxd',
         href: '/settings/import',
     },
+    {
+        title: 'API',
+        href: '/settings/api',
+    },
 ];
 
 const currentPath = window.location.pathname;

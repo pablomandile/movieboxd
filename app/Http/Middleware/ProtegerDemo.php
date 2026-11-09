@@ -9,9 +9,9 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * En la demo (APP_DEMO=true) hay una cuenta compartida: nadie se registra, entra
  * con Google ni recupera la clave, la cuenta no se puede cambiar ni borrar, y no se
- * importan exportaciones de Letterboxd (dispararían miles de pedidos a TMDB). El
- * resto sí —loguear, reseñar, armar listas—: es lo que se quiere mostrar, y se
- * resiembra de noche.
+ * importan exportaciones de Letterboxd (dispararían miles de pedidos a TMDB) ni
+ * se crean tokens de la API. El resto sí —loguear, reseñar, armar listas—: es lo
+ * que se quiere mostrar, y se resiembra de noche.
  */
 class ProtegerDemo
 {
@@ -22,7 +22,7 @@ class ProtegerDemo
 
     // Cambios de la cuenta: vuelven atrás con un aviso.
     private const ACCIONES = [
-        'password.email', 'password.store', 'password.update', 'profile.update', 'profile.destroy', 'import.store',
+        'password.email', 'password.store', 'password.update', 'profile.update', 'profile.destroy', 'import.store', 'api-tokens.store',
     ];
 
     public function handle(Request $request, Closure $next): Response

@@ -81,7 +81,7 @@ class DemoResetTest extends TestCase
         $this->assertSame(Review::where('reviewable_type', 'title')->where('reviewable_id', $parasite->id)->count(), $parasite->reviews_count);
 
         // Nada en el futuro.
-        $this->assertFalse(DiaryEntry::where('watched_on', '>', today()->toDateString())->exists());
+        $this->assertFalse(DiaryEntry::whereDate('watched_on', '>', today())->exists());
         $this->assertFalse(Review::where('created_at', '>', now())->exists());
     }
 

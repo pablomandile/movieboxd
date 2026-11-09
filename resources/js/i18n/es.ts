@@ -266,6 +266,27 @@ export default {
     progress: {
         episodes: '{watched} de {total} episodios vistos',
     },
+    apiTokens: {
+        title: 'API',
+        description: 'Tokens para que otras apps (por ejemplo, Hoy Trasnoche) agreguen películas a tu watchlist.',
+        name: 'Nombre del token',
+        namePlaceholder: 'Hoy Trasnoche',
+        create: 'Crear token',
+        newTokenTitle: 'Copiá el token ahora',
+        newTokenBody: 'Es la única vez que se muestra. Si lo perdés, revocalo y creá otro.',
+        copy: 'Copiar',
+        copied: 'Copiado',
+        list: 'Tokens activos',
+        empty: 'Todavía no creaste ningún token.',
+        lastUsed: 'Último uso: {date}',
+        neverUsed: 'Sin usar todavía',
+        revoke: 'Revocar',
+        revokeConfirm: '¿Revocar el token «{name}»? La app que lo use deja de funcionar.',
+        docsTitle: 'Cómo se usa',
+        docsBody:
+            'Mandá el token en el header Authorization: Bearer <token>. Endpoints: GET /me, GET /match?title=&alt=&year=, POST /watchlist con tmdb_id y DELETE /watchlist/{tmdb_id}.',
+        demoBody: 'En la demo no se crean tokens de la API. En tu propia cuenta, un token deja que otra app agregue películas a tu watchlist.',
+    },
     demo: {
         title: 'Probá la demo',
         description: 'Un diario de un año y medio, reseñas, listas y amigos que comentan. Se reinicia todas las noches.',

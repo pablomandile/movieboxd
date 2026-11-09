@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Settings\ApiTokenController;
 use App\Http\Controllers\Settings\ImportController;
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProfileController;
@@ -8,6 +9,10 @@ use Inertia\Inertia;
 
 Route::middleware('auth')->group(function () {
     Route::redirect('settings', 'settings/profile');
+
+    Route::get('settings/api', [ApiTokenController::class, 'index'])->name('api-tokens.index');
+    Route::post('settings/api', [ApiTokenController::class, 'store'])->name('api-tokens.store');
+    Route::delete('settings/api/{token}', [ApiTokenController::class, 'destroy'])->whereNumber('token')->name('api-tokens.destroy');
 
     Route::get('settings/import', [ImportController::class, 'show'])->name('import.show');
     Route::post('settings/import', [ImportController::class, 'store'])->name('import.store');
