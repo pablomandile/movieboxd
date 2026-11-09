@@ -266,6 +266,17 @@ export default {
     progress: {
         episodes: '{watched} of {total} episodes watched',
     },
+    demo: {
+        title: 'Try the demo',
+        description: 'A year and a half of diary, reviews, lists and friends who comment. It resets every night.',
+        enter: 'Enter the demo',
+        orManual: 'or by hand',
+        accountTitle: 'Demo account',
+        accountBody:
+            'Everyone trying the demo shares this account, so its name, email and password can’t be changed and it can’t be deleted. Everything else can: log films, write reviews and build lists. It all goes back to how it was every night.',
+        importBody:
+            'Letterboxd exports can’t be imported in the demo. In your own account you upload the ZIP Letterboxd gives you, and your diary, ratings, reviews and watchlist are loaded.',
+    },
     auth: {
         loginTitle: 'Log in to your account',
         loginDescription: 'Enter your email and password below to log in',

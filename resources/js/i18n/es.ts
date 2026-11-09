@@ -266,6 +266,17 @@ export default {
     progress: {
         episodes: '{watched} de {total} episodios vistos',
     },
+    demo: {
+        title: 'Probá la demo',
+        description: 'Un diario de un año y medio, reseñas, listas y amigos que comentan. Se reinicia todas las noches.',
+        enter: 'Entrar a la demo',
+        orManual: 'o a mano',
+        accountTitle: 'Cuenta de demostración',
+        accountBody:
+            'Esta cuenta la comparten todos los que prueban la demo, así que no se puede cambiar el nombre, el email ni la contraseña, ni eliminarla. Lo demás sí: logueá películas, reseñá y armá listas. Todo vuelve a como estaba cada noche.',
+        importBody:
+            'En la demo no se importan exportaciones de Letterboxd. En tu propia cuenta, subís el ZIP que te da Letterboxd y se cargan tu diario, puntajes, reseñas y watchlist.',
+    },
     auth: {
         loginTitle: 'Iniciá sesión en tu cuenta',
         loginDescription: 'Ingresá tu email y contraseña para entrar',

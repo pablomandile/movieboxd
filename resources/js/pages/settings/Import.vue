@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DemoNotice from '@/components/DemoNotice.vue';
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import InputError from '@/components/InputError.vue';
 import ProgressBar from '@/components/ProgressBar.vue';
@@ -7,7 +8,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
-import { Head, useForm, usePoll } from '@inertiajs/vue3';
+import type { SharedData } from '@/types';
+import { Head, useForm, usePage, usePoll } from '@inertiajs/vue3';
 import { LoaderCircle, Upload } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -31,6 +33,7 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
+const demo = usePage<SharedData>().props.demo;
 
 // Mientras haya una importación activa, refrescar las props cada 2,5 s
 const { start, stop } = usePoll(2500, { only: ['imports', 'hasActiveImport'] }, { autoStart: false });
@@ -85,8 +88,10 @@ function submit() {
             <div class="space-y-10">
                 <HeadingSmall :title="t('import.title')" :description="t('import.description')" />
 
+                <DemoNotice v-if="demo" :body="t('demo.importBody')" />
+
                 <!-- Importación en curso -->
-                <div v-if="active" class="rounded bg-lb-panel p-4">
+                <div v-else-if="active" class="rounded bg-lb-panel p-4">
                     <p class="flex items-center gap-2 text-sm font-semibold text-white">
                         <LoaderCircle class="size-4 animate-spin text-lb-green" />
                         {{ active.status === 'pending' ? t('import.preparing') : t('import.processing') }}

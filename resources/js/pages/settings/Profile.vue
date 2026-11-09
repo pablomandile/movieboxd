@@ -3,6 +3,7 @@ import { TransitionRoot } from '@headlessui/vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 
 import DeleteUser from '@/components/DeleteUser.vue';
+import DemoNotice from '@/components/DemoNotice.vue';
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const page = usePage<SharedData>();
+// En la demo la cuenta es compartida: no se cambia ni se borra (ver ProtegerDemo).
+const demo = page.props.demo;
 const user = page.props.auth.user as User;
 
 const form = useForm({
@@ -51,7 +54,9 @@ const submit = () => {
             <div class="flex flex-col space-y-6">
                 <HeadingSmall title="Profile information" description="Update your name and email address" />
 
-                <form @submit.prevent="submit" class="space-y-6">
+                <DemoNotice />
+
+                <form v-if="!demo" @submit.prevent="submit" class="space-y-6">
                     <div class="grid gap-2">
                         <Label for="name">Name</Label>
                         <Input id="name" class="mt-1 block w-full" v-model="form.name" required autocomplete="name" placeholder="Full name" />
@@ -106,7 +111,7 @@ const submit = () => {
                 </form>
             </div>
 
-            <DeleteUser :has-password="hasPassword" />
+            <DeleteUser v-if="!demo" :has-password="hasPassword" />
         </SettingsLayout>
     </AppLayout>
 </template>

@@ -87,12 +87,17 @@ class HandleInertiaRequests extends Middleware
                     'id', 'name', 'username', 'email', 'avatar_path', 'role', 'locale', 'email_verified_at'
                 ),
             ],
-            // El botón de Google solo aparece si hay credenciales cargadas
+            // El botón de Google solo aparece si hay credenciales cargadas (y nunca en la demo)
             'oauth' => fn () => [
-                'google' => GoogleController::configured(),
+                'google' => GoogleController::configured() && ! config('demo.enabled'),
             ],
+            // Datos de acceso de la demo (solo con APP_DEMO=true), para el login.
+            'demo' => config('demo.enabled')
+                ? ['email' => config('demo.email'), 'password' => config('demo.password')]
+                : null,
             'flash' => fn () => [
                 'status' => $request->session()->get('status'),
+                'error' => $request->session()->get('error'),
                 // Enlace de invitación: se entrega una sola vez, al pedirlo
                 'inviteUrl' => $request->session()->get('inviteUrl'),
             ],

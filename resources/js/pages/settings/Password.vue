@@ -3,14 +3,15 @@ import InputError from '@/components/InputError.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { TransitionRoot } from '@headlessui/vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
+import DemoNotice from '@/components/DemoNotice.vue';
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type SharedData } from '@/types';
 
 import { useI18n } from 'vue-i18n';
 
@@ -23,6 +24,7 @@ interface Props {
 withDefaults(defineProps<Props>(), { hasPassword: true });
 
 const { t } = useI18n();
+const demo = usePage<SharedData>().props.demo;
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
@@ -76,7 +78,9 @@ const updatePassword = () => {
                     "
                 />
 
-                <form @submit.prevent="updatePassword" class="space-y-6">
+                <DemoNotice />
+
+                <form v-if="!demo" @submit.prevent="updatePassword" class="space-y-6">
                     <!-- Sin contraseña previa (cuenta de Google) no hay nada que confirmar -->
                     <div v-if="hasPassword" class="grid gap-2">
                         <Label for="current_password">Current Password</Label>
