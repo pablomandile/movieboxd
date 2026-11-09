@@ -202,6 +202,26 @@ class WatchlistApiTest extends TestCase
         $this->api()->deleteJson('/api/v1/watchlist/603')->assertNotFound();
     }
 
+    public function test_status_reports_many_films_at_once_for_the_token_user(): void
+    {
+        $enLista = Title::factory()->create(['tmdb_id' => 603]);
+        $vista = Title::factory()->create(['tmdb_id' => 496243]);
+        $ajena = Title::factory()->create(['tmdb_id' => 129]);
+        WatchlistItem::create(['user_id' => $this->user->id, 'title_id' => $enLista->id]);
+        WatchedTitle::create(['user_id' => $this->user->id, 'title_id' => $vista->id]);
+        WatchlistItem::create(['user_id' => User::factory()->create()->id, 'title_id' => $ajena->id]);
+
+        $this->api()->getJson('/api/v1/watchlist/status?tmdb_ids=603,496243,129,777')
+            ->assertOk()
+            ->assertJsonPath('titles.603.in_watchlist', true)
+            ->assertJsonPath('titles.603.url', route('films.show', $enLista))
+            ->assertJsonPath('titles.496243.watched', true)
+            ->assertJsonPath('titles.129.in_watchlist', false)
+            ->assertJsonMissingPath('titles.777');
+
+        $this->api()->getJson('/api/v1/watchlist/status')->assertUnprocessable();
+    }
+
     public function test_a_token_only_touches_its_own_user(): void
     {
         $otro = User::factory()->create();

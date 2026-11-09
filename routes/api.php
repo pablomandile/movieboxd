@@ -15,6 +15,7 @@ Route::prefix('v1')
     ->group(function () {
         Route::get('me', fn (Request $request) => $request->user()->only('username', 'name'))->name('api.me');
         Route::get('match', MatchController::class)->name('api.match');
+        Route::get('watchlist/status', [WatchlistController::class, 'status'])->name('api.watchlist.status');
         Route::post('watchlist', [WatchlistController::class, 'store'])->name('api.watchlist.store');
         Route::delete('watchlist/{tmdbId}', [WatchlistController::class, 'destroy'])
             ->whereNumber('tmdbId')

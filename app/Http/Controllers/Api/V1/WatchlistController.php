@@ -70,6 +70,36 @@ class WatchlistController extends Controller
         return $this->respond('removed', $title, $request, 200);
     }
 
+    /**
+     * GET /api/v1/watchlist/status?tmdb_ids=1,2,3
+     *
+     * Estado de muchas películas en un solo pedido, para que la app externa
+     * pinte sus botones al cargar. Solo vienen las que están en el catálogo;
+     * las que faltan no están ni en la watchlist ni vistas.
+     */
+    public function status(Request $request): JsonResponse
+    {
+        $request->merge(['tmdb_ids' => array_values(array_filter(explode(',', (string) $request->query('tmdb_ids', '')), 'strlen'))]);
+        $ids = $request->validate([
+            'tmdb_ids' => ['required', 'array', 'max:500'],
+            'tmdb_ids.*' => ['integer', 'min:1'],
+        ])['tmdb_ids'];
+
+        $titles = Title::where('type', TitleType::Movie)->whereIn('tmdb_id', $ids)->get();
+        $userId = $request->user()->id;
+        $enWatchlist = WatchlistItem::where('user_id', $userId)->whereIn('title_id', $titles->modelKeys())->pluck('title_id')->flip();
+        $vistas = WatchedTitle::where('user_id', $userId)->whereIn('title_id', $titles->modelKeys())->pluck('title_id')->flip();
+
+        return response()->json(['titles' => $titles->mapWithKeys(fn (Title $title) => [$title->tmdb_id => [
+            'tmdb_id' => $title->tmdb_id,
+            'title' => $title->localized_title,
+            'year' => $title->year,
+            'url' => route('films.show', $title),
+            'in_watchlist' => $enWatchlist->has($title->id),
+            'watched' => $vistas->has($title->id),
+        ]])]);
+    }
+
     private function respond(string $status, Title $title, Request $request, int $code): JsonResponse
     {
         return response()->json(['status' => $status, 'title' => (new TitleResource($title))->toArray($request)], $code);
