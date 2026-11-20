@@ -7,6 +7,7 @@ use App\Models\Person;
 use App\Models\Season;
 use App\Models\Setting;
 use App\Models\Title;
+use App\Support\Metrics;
 use Illuminate\Support\Str;
 
 /**
@@ -97,6 +98,7 @@ class TmdbImportService
     public function importSeason(Title $title, int $seasonNumber): Season
     {
         $data = $this->client->tvSeason($title->tmdb_id, $seasonNumber);
+        Metrics::increment(Metrics::IMPORTED_SEASONS);
 
         $season = $title->seasons()->updateOrCreate(
             ['season_number' => $seasonNumber],
@@ -149,6 +151,8 @@ class TmdbImportService
             return $existing;
         }
 
+        Metrics::increment(Metrics::IMPORTED_TITLES);
+
         // El slug se genera una sola vez: las URLs son estables
         return Title::create($attributes + [
             'type' => $type,
@@ -173,6 +177,10 @@ class TmdbImportService
         $name = $data['name'] ?? (string) $tmdbId;
 
         $person = Person::firstOrNew(['tmdb_id' => $tmdbId]);
+
+        if (! $person->exists) {
+            Metrics::increment(Metrics::IMPORTED_PEOPLE);
+        }
 
         $person->fill([
             'name' => $name,

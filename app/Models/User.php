@@ -55,6 +55,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'role' => Role::class,
             'banned_at' => 'datetime',
+            'last_seen_at' => 'datetime',
         ];
     }
 

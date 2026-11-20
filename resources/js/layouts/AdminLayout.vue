@@ -5,13 +5,14 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 defineProps<{
-    active: 'dashboard' | 'users' | 'reports' | 'settings';
+    active: 'dashboard' | 'stats' | 'users' | 'reports' | 'settings';
 }>();
 
 const { t } = useI18n();
 
 const tabs = computed(() => [
     { key: 'dashboard', label: t('admin.dashboard'), href: route('admin.dashboard') },
+    { key: 'stats', label: t('admin.statistics'), href: route('admin.stats') },
     { key: 'users', label: t('admin.users'), href: route('admin.users.index') },
     { key: 'reports', label: t('admin.reports'), href: route('admin.reports.index') },
     { key: 'settings', label: t('admin.settings'), href: route('admin.settings.edit') },

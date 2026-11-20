@@ -3,6 +3,7 @@
 namespace App\Services\Tmdb;
 
 use App\Models\Setting;
+use App\Support\Metrics;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
@@ -138,6 +139,8 @@ class TmdbClient
 
     protected function get(string $path, array $query = []): array
     {
+        Metrics::increment(Metrics::TMDB_REQUESTS);
+
         return Http::baseUrl($this->baseUrl)
             ->timeout(10)
             ->retry(3, 200)

@@ -33,7 +33,10 @@ class CatalogImportGate
      */
     public static function authorize(Request $request): void
     {
-        abort_if(self::isCrawler($request), 404);
+        if (self::isCrawler($request)) {
+            Metrics::increment(Metrics::BLOCKED_CRAWLERS);
+            abort(404);
+        }
 
         if ($request->user() !== null) {
             return;
@@ -42,7 +45,10 @@ class CatalogImportGate
         $key = 'tmdb-imports:guests:'.now()->toDateString();
         $limit = (int) config('services.tmdb.guest_imports_per_day', 500);
 
-        abort_if(RateLimiter::tooManyAttempts($key, $limit), 429);
+        if (RateLimiter::tooManyAttempts($key, $limit)) {
+            Metrics::increment(Metrics::BLOCKED_QUOTA);
+            abort(429);
+        }
 
         RateLimiter::hit($key, 86400);
     }

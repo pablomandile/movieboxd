@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Support\CatalogUsage;
+use App\Support\Metrics;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -37,6 +38,11 @@ class PruneCatalog extends Command
 
         $verb = $dryRun ? 'Se borrarían' : 'Borrados';
         $this->info("{$verb}: {$titles} títulos y {$people} personas.");
+
+        if (! $dryRun) {
+            Metrics::increment(Metrics::PRUNED_TITLES, $titles);
+            Metrics::increment(Metrics::PRUNED_PEOPLE, $people);
+        }
 
         if (! $dryRun && $titles + $people > 0) {
             $this->optimize($titles > 0 ? ['titles', 'seasons', 'episodes', 'people'] : ['people']);

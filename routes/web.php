@@ -132,6 +132,7 @@ Route::put('settings/locale', [LocaleController::class, 'update'])->name('locale
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', Admin\DashboardController::class)->name('dashboard');
+    Route::get('stats', Admin\StatsController::class)->name('stats');
 
     // {user:id}: el binding por defecto del modelo es username
     Route::get('users', [Admin\UserController::class, 'index'])->name('users.index');
