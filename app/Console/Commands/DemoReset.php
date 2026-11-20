@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\Role;
 use App\Models\Episode;
 use App\Models\Like;
 use App\Models\Review;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Deja la demo como nueva: borra los usuarios (y con ellos, en cascada, todo lo que
+ * Deja la demo como nueva: borra los usuarios menos los admins (y con ellos, en cascada, todo lo que
  * cargaron) y resiembra el usuario demo con sus amigos. Corre todas las noches en
  * la copia de pablomandile (ver routes/console.php).
  *
@@ -44,7 +45,8 @@ class DemoReset extends Command
         $afectados = $this->sujetosConDatosDeUsuarios();
 
         DB::transaction(function () {
-            DB::table('users')->delete();
+            // Los admins se quedan: son los que entran a mirar las estadísticas de la demo
+            DB::table('users')->where('role', '!=', Role::Admin->value)->delete();
             foreach (['sessions', 'password_reset_tokens', 'jobs', 'job_batches', 'failed_jobs'] as $tabla) {
                 DB::table($tabla)->delete();
             }

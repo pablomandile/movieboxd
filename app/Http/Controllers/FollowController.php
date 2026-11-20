@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Support\Usage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -18,6 +19,7 @@ class FollowController extends Controller
             $follower->following()->detach($user->id);
         } else {
             $follower->following()->syncWithoutDetaching([$user->id]);
+            Usage::action('follows');
         }
 
         return back();

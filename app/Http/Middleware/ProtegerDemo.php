@@ -38,7 +38,8 @@ class ProtegerDemo
             return redirect()->route('login');
         }
 
-        if (in_array($ruta, self::ACCIONES, true)) {
+        // La cuenta de un admin no es la compartida: puede cambiar su clave y su perfil
+        if (in_array($ruta, self::ACCIONES, true) && ! $request->user()?->isAdmin()) {
             return back()->with('error', 'En la demo no se puede cambiar la cuenta.');
         }
 

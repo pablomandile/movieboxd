@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\EpisodeWatch;
 use App\Models\Season;
+use App\Support\Usage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -38,6 +39,8 @@ class SeasonWatchController extends Controller
 
         if ($rows !== []) {
             EpisodeWatch::insert($rows);
+            // insert masivo: no dispara el evento created que cuenta las acciones
+            Usage::action('episodes', count($rows));
         }
 
         return back();

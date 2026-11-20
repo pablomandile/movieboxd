@@ -2,15 +2,22 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\CatalogImportGate;
+use App\Support\Metrics;
+use App\Support\Usage;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Anota cuándo usó la app cada usuario logueado: users.last_seen_at y una fila
- * por día en user_activity_days. Escribe como mucho una vez cada 10 minutos por
- * sesión, así que no agrega una escritura a cada pedido.
+ * Anota el uso de la app para las estadísticas del admin:
+ *
+ * - Visitas: la primera página que ve cada sesión en el día (sin bots ni admins).
+ * - Páginas vistas: cada página que se muestra entera o por navegación de Inertia
+ *   (no las recargas parciales, ni los prefetch, ni las redirecciones).
+ * - Usuarios logueados: users.last_seen_at y una fila por día en user_activity_days,
+ *   como mucho una vez cada 10 minutos por sesión.
  */
 class TrackUserActivity
 {
@@ -32,6 +39,32 @@ class TrackUserActivity
             }
         }
 
-        return $next($request);
+        $response = $next($request);
+
+        if ($this->isPageView($request, $response) && Usage::counts($request->user())) {
+            Metrics::increment(Metrics::PAGEVIEWS);
+
+            $today = now()->toDateString();
+            if ($request->hasSession() && $request->session()->get('visit_day') !== $today) {
+                Metrics::increment(Metrics::VISITS);
+                $request->session()->put('visit_day', $today);
+            }
+        }
+
+        return $response;
+    }
+
+    private function isPageView(Request $request, Response $response): bool
+    {
+        if (! $request->isMethod('GET') || $response->getStatusCode() !== 200 || CatalogImportGate::isCrawler($request)) {
+            return false;
+        }
+
+        if ($request->header('X-Inertia-Partial-Data') !== null || $request->header('Purpose') === 'prefetch') {
+            return false;
+        }
+
+        return $request->header('X-Inertia') !== null
+            || str_contains((string) $request->header('Accept'), 'text/html');
     }
 }

@@ -9,6 +9,7 @@ use App\Models\Review;
 use App\Models\Season;
 use App\Models\Title;
 use App\Models\User;
+use App\Support\Usage;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\RateLimiter;
@@ -39,6 +40,9 @@ class AppServiceProvider extends ServiceProvider
             'comment' => Comment::class,
             'list' => ListModel::class,
         ]);
+
+        // Contadores de uso para las estadísticas del admin
+        Usage::register();
 
         // Límite de jobs contra TMDB (su tope real es ~40 req/s)
         RateLimiter::for('tmdb', function (object $job) {

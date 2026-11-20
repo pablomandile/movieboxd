@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Demo;
 
+use App\Enums\Role;
 use App\Models\DiaryEntry;
 use App\Models\Episode;
 use App\Models\Favorite;
@@ -46,6 +47,16 @@ class DemoResetTest extends TestCase
         $this->assertSame(0, $ajena->watched_count);
         $this->assertSame(0, $ajena->ratings_count);
         $this->assertSame([], Storage::disk('local')->allFiles());
+    }
+
+    public function test_reset_keeps_the_admins_who_look_at_the_demo_stats(): void
+    {
+        $admin = User::factory()->create(['role' => Role::Admin, 'username' => 'pablo']);
+
+        $this->artisan('demo:reset')->assertSuccessful();
+
+        $this->assertModelExists($admin);
+        $this->assertEqualsCanonicalizing([...self::DEMO_USERS, 'pablo'], User::pluck('username')->all());
     }
 
     public function test_seeds_a_coherent_demo_over_the_titles_in_the_catalog(): void

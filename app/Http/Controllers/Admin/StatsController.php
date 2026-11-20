@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Support\Metrics;
+use App\Support\Usage;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -25,27 +26,41 @@ class StatsController extends Controller
         $today = CarbonImmutable::today();
         $start = $today->subDays(self::DAYS - 1);
 
+        $demo = (bool) config('demo.enabled');
+
         return Inertia::render('admin/Stats', [
-            'summary' => $this->summary($today),
+            'demo' => $demo,
+            'summary' => $this->summary($today, $start),
             'days' => $this->days($start),
-            'users' => $this->users($start),
+            'actions' => $this->actions($start),
+            // En la demo todos entran con la misma cuenta: el detalle por usuario no dice nada
+            'users' => $demo ? null : $this->users($start),
             'technical' => $this->technical($start),
         ]);
     }
 
-    private function summary(CarbonImmutable $today): array
+    private function summary(CarbonImmutable $today, CarbonImmutable $start): array
     {
+        $metric = fn (string $name, CarbonImmutable $from) => (int) DB::table('daily_metrics')
+            ->where('metric', $name)
+            ->where('date', '>=', $from->toDateString())
+            ->sum('total');
+
         $activeSince = fn (CarbonImmutable $from) => DB::table('user_activity_days')
             ->where('date', '>=', $from->toDateString())
             ->distinct()
             ->count('user_id');
 
         return [
+            'visitsToday' => $metric(Metrics::VISITS, $today),
+            'visits30' => $metric(Metrics::VISITS, $start),
+            'logins30' => $metric(Metrics::LOGINS, $start),
+            'actions30' => (int) DB::table('daily_metrics')
+                ->where('metric', 'like', Metrics::ACTIONS_PREFIX.'%')
+                ->where('date', '>=', $start->toDateString())
+                ->sum('total'),
+            'active30' => $activeSince($start),
             'users' => User::count(),
-            'activeToday' => $activeSince($today),
-            'active7' => $activeSince($today->subDays(6)),
-            'active30' => $activeSince($today->subDays(self::DAYS - 1)),
-            'new30' => User::where('created_at', '>=', $today->subDays(self::DAYS - 1))->count(),
         ];
     }
 
@@ -67,9 +82,6 @@ class StatsController extends Controller
                 ->groupBy('date')
                 ->pluck('total', 'day'),
             'signups' => $byCreatedAt('users'),
-            'watched' => $byCreatedAt('watched_titles'),
-            'diary' => $byCreatedAt('diary_entries'),
-            'reviews' => $byCreatedAt('reviews'),
         ];
 
         $metrics = DB::table('daily_metrics')
@@ -89,6 +101,10 @@ class StatsController extends Controller
             }, collect());
 
         $series += [
+            'visits' => $metric(Metrics::VISITS),
+            'pageviews' => $metric(Metrics::PAGEVIEWS),
+            'logins' => $metric(Metrics::LOGINS),
+            'actions' => $metric(...array_map(fn (string $action) => Metrics::ACTIONS_PREFIX.$action, Usage::actionNames())),
             'tmdbRequests' => $metric(Metrics::TMDB_REQUESTS),
             'imports' => $metric(Metrics::IMPORTED_TITLES, Metrics::IMPORTED_PEOPLE),
             'blocked' => $metric(Metrics::BLOCKED_CRAWLERS, Metrics::BLOCKED_QUOTA),
@@ -103,6 +119,27 @@ class StatsController extends Controller
                     $series
                 );
             })
+            ->all();
+    }
+
+    /**
+     * Cuántas veces se hizo cada cosa en los últimos 30 días, de la más a la menos usada.
+     *
+     * @return list<array{key: string, total: int}>
+     */
+    private function actions(CarbonImmutable $start): array
+    {
+        $totals = DB::table('daily_metrics')
+            ->where('metric', 'like', Metrics::ACTIONS_PREFIX.'%')
+            ->where('date', '>=', $start->toDateString())
+            ->groupBy('metric')
+            ->selectRaw('metric, sum(total) as total')
+            ->pluck('total', 'metric');
+
+        return collect(Usage::actionNames())
+            ->map(fn (string $action) => ['key' => $action, 'total' => (int) ($totals[Metrics::ACTIONS_PREFIX.$action] ?? 0)])
+            ->sortByDesc('total')
+            ->values()
             ->all();
     }
 

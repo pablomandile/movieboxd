@@ -27,6 +27,15 @@ class Metrics
 
     public const PRUNED_PEOPLE = 'pruned.people';
 
+    public const VISITS = 'visits';
+
+    public const PAGEVIEWS = 'pageviews';
+
+    public const LOGINS = 'logins';
+
+    /** Seguido del nombre de la acción (ver App\Support\Usage::ACTIONS). */
+    public const ACTIONS_PREFIX = 'actions.';
+
     public static function increment(string $metric, int $by = 1): void
     {
         if ($by <= 0) {
