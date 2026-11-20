@@ -8,7 +8,7 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
 const EMAIL = 'pablo.mandile@gmail.com';
-const WEBSITE = 'https://bioinfo.pablomandile.com.ar/pablo';
+const WEBSITE = 'https://bioinfo.bambudev.com.ar/pablo';
 </script>
 
 <template>
