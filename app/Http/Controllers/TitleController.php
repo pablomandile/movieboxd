@@ -12,6 +12,7 @@ use App\Models\Rating;
 use App\Models\Title;
 use App\Models\WatchedTitle;
 use App\Models\WatchlistItem;
+use App\Support\CatalogImportGate;
 use App\Support\PageMeta;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -24,6 +25,7 @@ class TitleController extends Controller
         abort_unless($title->isMovie(), 404);
 
         $this->refreshIfStale($title);
+        self::recordView($request, $title);
 
         return Inertia::render('titles/Film', [
             'title' => $this->titleProps($title),
@@ -43,6 +45,7 @@ class TitleController extends Controller
         abort_unless($title->isTv(), 404);
 
         $this->refreshIfStale($title);
+        self::recordView($request, $title);
 
         $watchedPerSeason = $request->user()
             ? EpisodeWatch::where('user_id', $request->user()->id)
@@ -72,6 +75,17 @@ class TitleController extends Controller
                 'watchedCount' => (int) ($watchedPerSeason[$season->id] ?? 0),
             ]),
         ]);
+    }
+
+    /**
+     * Las visitas de personas mantienen el título en el catálogo; las de bots no
+     * (ver movieboxd:prune-catalog). También lo usan temporadas y episodios.
+     */
+    public static function recordView(Request $request, Title $title): void
+    {
+        if (! CatalogImportGate::isCrawler($request)) {
+            $title->markViewed();
+        }
     }
 
     protected function refreshIfStale(Title $title): void

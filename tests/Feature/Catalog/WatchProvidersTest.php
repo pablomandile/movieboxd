@@ -5,6 +5,8 @@ namespace Tests\Feature\Catalog;
 use App\Jobs\RefreshTitle;
 use App\Models\Setting;
 use App\Models\Title;
+use App\Models\User;
+use App\Models\WatchlistItem;
 use App\Services\Tmdb\TmdbImportService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -135,6 +137,8 @@ class WatchProvidersTest extends TestCase
             'synced_at' => now(),
             'watch_providers_synced_at' => null,
         ]);
+        // refresh-stale solo recorre los títulos en uso
+        WatchlistItem::create(['user_id' => User::factory()->create()->id, 'title_id' => $title->id]);
 
         Queue::fake();
 
@@ -150,6 +154,8 @@ class WatchProvidersTest extends TestCase
             'synced_at' => now(),
             'watch_providers_synced_at' => now()->subDays(10),
         ]);
+        // refresh-stale solo recorre los títulos en uso
+        WatchlistItem::create(['user_id' => User::factory()->create()->id, 'title_id' => $title->id]);
 
         Queue::fake();
 

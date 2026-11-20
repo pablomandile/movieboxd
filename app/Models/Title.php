@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\TitleType;
 use App\Models\Concerns\HasRatingAggregates;
 use App\Models\Concerns\HasTranslations;
+use App\Models\Concerns\TracksViews;
 use Database\Factories\TitleFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class Title extends Model
 {
     /** @use HasFactory<TitleFactory> */
-    use HasFactory, HasRatingAggregates, HasTranslations;
+    use HasFactory, HasRatingAggregates, HasTranslations, TracksViews;
 
     protected $guarded = [];
 
@@ -33,6 +34,7 @@ class Title extends Model
             'last_air_date' => 'date',
             'popularity' => 'float',
             'synced_at' => 'datetime',
+            'viewed_at' => 'datetime',
         ];
     }
 

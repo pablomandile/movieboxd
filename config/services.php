@@ -40,6 +40,8 @@ return [
         'base_url' => env('TMDB_BASE_URL', 'https://api.themoviedb.org/3'),
         // País para "dónde verlo". El panel de admin puede sobrescribirlo.
         'watch_region' => env('TMDB_WATCH_REGION', 'AR'),
+        // Importaciones nuevas por día entre todos los visitantes sin cuenta (ver CatalogImportGate)
+        'guest_imports_per_day' => (int) env('TMDB_GUEST_IMPORTS_PER_DAY', 500),
     ],
 
     'google' => [

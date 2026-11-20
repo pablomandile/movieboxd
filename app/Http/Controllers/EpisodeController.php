@@ -6,6 +6,7 @@ use App\Models\EpisodeWatch;
 use App\Models\Rating;
 use App\Models\Title;
 use App\Services\Tmdb\TmdbImportService;
+use App\Support\CatalogImportGate;
 use App\Support\PageMeta;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -20,8 +21,11 @@ class EpisodeController extends Controller
         $season = $title->seasons()->where('season_number', $seasonNumber)->first() ?? abort(404);
 
         if ($season->needsEpisodeSync()) {
+            CatalogImportGate::authorize($request);
             $season = $importer->importSeason($title, $seasonNumber);
         }
+
+        TitleController::recordView($request, $title);
 
         $episode = $season->episodes()->where('episode_number', $episodeNumber)->first() ?? abort(404);
 

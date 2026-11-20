@@ -5,19 +5,27 @@ namespace App\Console\Commands;
 use App\Enums\TitleType;
 use App\Jobs\RefreshTitle;
 use App\Models\Title;
+use App\Support\CatalogUsage;
 use Illuminate\Console\Command;
 
 class RefreshStaleTitles extends Command
 {
     protected $signature = 'movieboxd:refresh-stale';
 
-    protected $description = 'Encola el refresco de títulos con snapshot viejo de TMDB';
+    protected $description = 'Encola el refresco de títulos en uso con snapshot viejo de TMDB';
 
+    /**
+     * Solo los títulos con datos de usuarios (más los de la demo): esos aparecen en
+     * perfiles, listas y el feed sin que nadie entre a su ficha. El resto se refresca
+     * al visitarlo (TitleController::refreshIfStale), así que recorrer todo el
+     * catálogo era pedirle a TMDB miles de títulos por día que nadie miraba.
+     */
     public function handle(): int
     {
         $airing = ['Returning Series', 'In Production', 'Planned'];
 
         $query = Title::query()
+            ->whereIn('id', CatalogUsage::protectedTitleIds())
             ->where(function ($q) use ($airing) {
                 $q->whereNull('synced_at')
                     // Películas y series terminadas: 30 días

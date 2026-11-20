@@ -8,6 +8,7 @@ use App\Models\Rating;
 use App\Models\Season;
 use App\Models\Title;
 use App\Services\Tmdb\TmdbImportService;
+use App\Support\CatalogImportGate;
 use App\Support\PageMeta;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -23,8 +24,11 @@ class SeasonController extends Controller
 
         // Import lazy de episodios: primera visita a la temporada = 1 llamada API
         if ($season->needsEpisodeSync()) {
+            CatalogImportGate::authorize($request);
             $season = $importer->importSeason($title, $seasonNumber);
         }
+
+        TitleController::recordView($request, $title);
 
         $user = $request->user();
 

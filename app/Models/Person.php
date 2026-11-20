@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\TracksViews;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Person extends Model
 {
-    use HasFactory;
+    use HasFactory, TracksViews;
 
     protected $table = 'people';
 
@@ -26,6 +27,7 @@ class Person extends Model
             'deathday' => 'date',
             'popularity' => 'float',
             'synced_at' => 'datetime',
+            'viewed_at' => 'datetime',
         ];
     }
 

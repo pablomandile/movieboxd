@@ -42,6 +42,9 @@ class DemoSeeder extends Seeder
         329, 194, 62, 603, 28, 557, 118340, 446159, 244786, 670, 598, 940721, 4935, 792293,
     ];
 
+    // Series a medio ver de Tomás.
+    private const SERIES = [87108, 136315, 95396, 100088];
+
     // Las que tiene pendientes (watchlist).
     private const PENDIENTES = [346, 18148, 11216, 26405, 49797, 792307, 693134, 1022789, 976573, 530385, 466272];
 
@@ -120,17 +123,30 @@ class DemoSeeder extends Seeder
 
     private CarbonImmutable $hoy;
 
+    /**
+     * Los títulos de TMDB que usa la demo, por tipo. movieboxd:prune-catalog no los
+     * borra: este seeder nunca llama a TMDB, así que si faltan la demo queda vacía.
+     *
+     * @return array{movie: list<int>, tv: list<int>}
+     */
+    public static function catalogo(): array
+    {
+        return [
+            'movie' => array_values(array_unique(array_merge(self::VISTAS, self::PENDIENTES, ...array_map(
+                fn ($a) => array_keys($a['vistas']), array_values(self::AMIGOS)
+            )))),
+            'tv' => self::SERIES,
+        ];
+    }
+
     public function run(): void
     {
         mt_srand(20261108);
         $this->hoy = CarbonImmutable::now();
 
-        $vistas = self::VISTAS;
-        $todas = array_unique(array_merge($vistas, self::PENDIENTES, ...array_map(
-            fn ($a) => array_keys($a['vistas']), array_values(self::AMIGOS)
-        )));
-        $this->peliculas = Title::where('type', 'movie')->whereIn('tmdb_id', $todas)->get()->keyBy('tmdb_id');
-        $this->series = Title::where('type', 'tv')->whereIn('tmdb_id', [87108, 136315, 95396, 100088])->get()->keyBy('tmdb_id');
+        $catalogo = self::catalogo();
+        $this->peliculas = Title::where('type', 'movie')->whereIn('tmdb_id', $catalogo['movie'])->get()->keyBy('tmdb_id');
+        $this->series = Title::where('type', 'tv')->whereIn('tmdb_id', $catalogo['tv'])->get()->keyBy('tmdb_id');
 
         $demo = User::create([
             'name' => 'Demo',

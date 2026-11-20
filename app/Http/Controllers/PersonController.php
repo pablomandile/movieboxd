@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Jobs\RefreshPerson;
 use App\Models\Person;
 use App\Services\Tmdb\TmdbImportService;
+use App\Support\CatalogImportGate;
 use App\Support\PageMeta;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -16,15 +18,24 @@ class PersonController extends Controller
      * Import on demand, igual que con los títulos: la primera visita a una
      * persona la trae de TMDB y redirige a su URL canónica.
      */
-    public function resolve(int $tmdbId, TmdbImportService $importer): RedirectResponse
+    public function resolve(Request $request, int $tmdbId, TmdbImportService $importer): RedirectResponse
     {
-        $person = Person::where('tmdb_id', $tmdbId)->first() ?? $importer->importPerson($tmdbId);
+        $person = Person::where('tmdb_id', $tmdbId)->first();
+
+        if ($person === null) {
+            CatalogImportGate::authorize($request);
+            $person = $importer->importPerson($tmdbId);
+        }
 
         return redirect()->route('people.show', $person, 301);
     }
 
-    public function show(Person $person): Response
+    public function show(Request $request, Person $person): Response
     {
+        if (! CatalogImportGate::isCrawler($request)) {
+            $person->markViewed();
+        }
+
         // Refresco en segundo plano: la página se sirve del snapshot y no espera
         if ($person->isStale()) {
             RefreshPerson::dispatch($person);
