@@ -288,6 +288,8 @@ export default {
         demoBody: 'API tokens can’t be created in the demo. In your own account, a token lets another app add films to your watchlist.',
     },
     demo: {
+        bannerTitle: 'Demo version.',
+        bannerBody: 'This isn’t the final version, and everything you do is wiped every 24 hours.',
         title: 'Try the demo',
         description: 'A year and a half of diary, reviews, lists and friends who comment. It resets every night.',
         enter: 'Enter the demo',

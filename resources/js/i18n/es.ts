@@ -288,6 +288,8 @@ export default {
         demoBody: 'En la demo no se crean tokens de la API. En tu propia cuenta, un token deja que otra app agregue películas a tu watchlist.',
     },
     demo: {
+        bannerTitle: 'Versión de demostración.',
+        bannerBody: 'No es la versión final y todo lo que hagas se borra cada 24 horas.',
         title: 'Probá la demo',
         description: 'Un diario de un año y medio, reseñas, listas y amigos que comentan. Se reinicia todas las noches.',
         enter: 'Entrar a la demo',

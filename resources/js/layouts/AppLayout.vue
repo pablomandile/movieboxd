@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DemoBanner from '@/components/DemoBanner.vue';
 import SiteFooter from '@/components/SiteFooter.vue';
 import SiteHeader from '@/components/SiteHeader.vue';
 import type { BreadcrumbItemType } from '@/types';
@@ -14,6 +15,7 @@ withDefaults(defineProps<Props>(), {
 
 <template>
     <div class="flex min-h-screen flex-col bg-lb-bg">
+        <DemoBanner />
         <SiteHeader />
         <main class="mx-auto w-full max-w-[1120px] flex-1 px-4 py-8">
             <slot />
